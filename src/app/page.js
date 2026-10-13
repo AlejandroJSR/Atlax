@@ -1,5 +1,4 @@
 "use client";
-import "@/styles/index.css";
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
@@ -198,41 +197,61 @@ export default function Home() {
     }
   };
 
+  const navLinks = [
+    { href: "#cursos", label: "Cursos" },
+    { href: "#metodo", label: "Método" },
+    { href: "#testimonios", label: "Alumnos" },
+    { href: "#faq", label: "Preguntas" },
+    { href: "#contacto", label: "Contacto" },
+  ];
+
   return (
     <>
       {/* NAVBAR */}
-      <nav className="bg-black/70 backdrop-blur-md fixed w-full z-50 top-0 left-0 shadow-md h-16 flex items-center">
-        <span className="text-2xl font-extrabold text-[#5b47db] pl-7 tracking-widest">
-          ATLAX
-        </span>
-        <ul className="hidden md:flex items-center gap-10 ml-auto pr-7">
-          <li><a className="font-extrabold text-white hover:text-indigo-300 transition" href="#inicio">Inicio</a></li>
-          <li><a className="font-extrabold text-white hover:text-indigo-300 transition" href="#cursos">Cursos</a></li>
-          <li><a className="font-extrabold text-white hover:text-indigo-300 transition" href="#testimonios">Testimonios</a></li>
-          <li><a className="font-extrabold text-white hover:text-indigo-300 transition" href="#contacto">Contacto</a></li>
-          <li>
-            <button
-              className="bg-indigo-700 font-extrabold text-white rounded-lg px-5 py-1.5 ml-2 transition hover:bg-indigo-900 shadow"
-              onClick={() => setShowLogin(true)} type="button">
-              ACCESO
-            </button>
-          </li>
-        </ul>
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden text-white text-3xl pr-7 ml-auto focus:outline-none">
-          ☰
-        </button>
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-line bg-bg/85 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
+          <a href="#inicio" className="flex items-center gap-2 font-mono text-lg font-medium tracking-[0.2em] text-ink">
+            <span className="inline-block h-2.5 w-2.5 rounded-[2px] bg-accent" aria-hidden="true" />
+            ATLAX
+          </a>
+          <ul className="ml-auto hidden items-center gap-1 md:flex">
+            {navLinks.map((l) => (
+              <li key={l.href}>
+                <a className="rounded-md px-3 py-2.5 text-sm text-muted transition-colors hover:text-ink" href={l.href}>
+                  {l.label}
+                </a>
+              </li>
+            ))}
+            <li className="ml-3">
+              <button className="btn-secondary btn-sm" onClick={() => setShowLogin(true)} type="button">
+                Acceso alumnos
+              </button>
+            </li>
+          </ul>
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="ml-auto flex h-11 w-11 items-center justify-center rounded-md text-ink md:hidden"
+            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={menuOpen}
+            type="button"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              {menuOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+            </svg>
+          </button>
+        </div>
         {menuOpen && (
-          <div className="absolute top-16 left-0 w-full bg-black/90 backdrop-blur-md flex flex-col gap-4 p-5 md:hidden">
-            <a className="font-bold text-white" href="#inicio" onClick={() => setMenuOpen(false)}>Inicio</a>
-            <a className="font-bold text-white" href="#cursos" onClick={() => setMenuOpen(false)}>Cursos</a>
-            <a className="font-bold text-white" href="#testimonios" onClick={() => setMenuOpen(false)}>Testimonios</a>
-            <a className="font-bold text-white" href="#contacto" onClick={() => setMenuOpen(false)}>Contacto</a>
+          <div className="flex flex-col border-t border-line bg-bg px-4 pb-5 pt-2 md:hidden">
+            {navLinks.map((l) => (
+              <a key={l.href} className="border-b border-line py-3.5 text-ink" href={l.href} onClick={() => setMenuOpen(false)}>
+                {l.label}
+              </a>
+            ))}
             <button
-              className="bg-indigo-700 font-bold text-white rounded px-4 py-2 mt-2"
+              className="btn-primary mt-4"
+              type="button"
               onClick={() => { setShowLogin(true); setMenuOpen(false); }}>
-              ACCESO
+              Acceso alumnos
             </button>
           </div>
         )}
@@ -264,115 +283,136 @@ export default function Home() {
           </div>
         </div>
       )}
-{/* HERO */}
-<section
-  id="inicio"
-  className="relative gradient-bg pt-32 pb-24 text-white min-h-[420px] overflow-hidden"
->
-  <div className="relative max-w-6xl mx-auto flex flex-col md:flex-row items-center px-7 z-10">
-    {/* Texto con animación */}
-    <div className="md:w-1/2 text-center md:text-left animate-fadeInUp">
-      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-7 leading-tight">
-        Domina el Mercado Forex con Atlax
-      </h1>
-      <p className="text-lg sm:text-xl mb-8 text-indigo-100 font-medium max-w-md mx-auto md:mx-0">
-        Aprende estrategias efectivas de la mano de expertos con años de experiencia en los mercados financieros.
-      </p>
 
-      {/* Botón igual al de las cards */}
-      <a
-        href="#cursos"
-        className="btn-gradient font-bold py-3 px-8 rounded text-lg shadow-lg transition-transform duration-300 transform hover:scale-110"
+      {/* HERO */}
+      <section
+        id="inicio"
+        className="relative overflow-hidden border-b border-line pt-16"
+        style={{
+          backgroundImage:
+            "radial-gradient(60% 50% at 75% 40%, rgba(198,244,50,0.08), transparent 70%), linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px)",
+          backgroundSize: "auto, 48px 48px, 48px 48px",
+        }}
       >
-        Empieza Ahora
-      </a>
-    </div>
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-[1.1fr_1fr] md:py-28">
+          <div className="animate-fadeInUp">
+            <p className="eyebrow mb-5">Escuela de trading Forex</p>
+            <h1 className="mb-6 text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
+              Domina el mercado Forex con Atlax
+            </h1>
+            <p className="mb-9 max-w-md text-lg leading-relaxed text-muted">
+              Estrategias, gestión de riesgo y psicología del trading, de la mano de traders que operan todos los días.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <a href="#cursos" className="btn-primary">
+                Ver cursos
+                <span aria-hidden="true">→</span>
+              </a>
+              <button type="button" onClick={() => setShowLogin(true)} className="btn-secondary">
+                Ya soy alumno
+              </button>
+            </div>
+          </div>
+          <div className="flex justify-center md:justify-end">
+            <img
+              src="https://i.ibb.co/99DmNSw6/Dise-o-sin-t-tulo-7-Photoroom.png"
+              alt="Plataforma de trading con gráficos de velas"
+              width={580}
+              height={420}
+              className="h-auto w-full max-w-[560px]"
+            />
+          </div>
+        </div>
+      </section>
 
-    {/* Imagen con animación de flotación */}
-    <div className="md:w-1/2 flex justify-center mt-10 md:mt-0 animate-fadeInUp">
-      <img
-        src="https://i.ibb.co/99DmNSw6/Dise-o-sin-t-tulo-7-Photoroom.png"
-        alt="Trading"
-        className="w-[340px] md:w-[520px] lg:w-[580px] rounded-xl drop-shadow-xl 
-                   transition-transform duration-500 ease-in-out hover:-translate-y-3 animate-float"
-      />
-    </div>
-  </div>
-</section>
-
-
-      <div className="w-full bg-black flex justify-center py-2">
+      <div className="w-full border-b border-line bg-bg py-1">
         <TradingViewWidget />
       </div>
 
-      {/* FEATURES */}
-<section className="bg-black py-14">
-  <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12 px-7">
-    <div className="flex flex-col items-center text-center">
-      <div className="bg-white/20 rounded-full p-3 mb-4">
-        <img src="https://img.icons8.com/fluency/96/monitor.png" alt="" className="w-12 h-12" />
-      </div>
-      <p className="text-lg font-medium leading-relaxed text-gray-200">
-        Aprendé de <span className="font-bold text-indigo-300">traders rentables</span> con años de experiencia real en el mercado.
-      </p>
-    </div>
-    <div className="flex flex-col items-center text-center">
-      <div className="bg-white/20 rounded-full p-3 mb-4">
-        <img src="https://img.icons8.com/fluency/96/ask-question.png" alt="" className="w-12 h-12" />
-      </div>
-      <p className="text-lg font-medium leading-relaxed text-gray-200">
-        Respondemos <span className="font-bold text-indigo-300">consultas personalizadas</span> y te acompañamos en todo tu proceso.
-      </p>
-    </div>
-    <div className="flex flex-col items-center text-center">
-      <div className="bg-white/20 rounded-full p-3 mb-4">
-        <img src="https://img.icons8.com/fluency/96/conference-call.png" alt="" className="w-12 h-12" />
-      </div>
-      <p className="text-lg font-medium leading-relaxed text-gray-200">
-        Accedé a una <span className="font-bold text-indigo-300">red activa de traders</span> para estar al día con las novedades del mercado.
-      </p>
-    </div>
-  </div>
-</section>
-
+      {/* MÉTODO */}
+      <section id="metodo" className="border-b border-line py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <p className="eyebrow mb-3">Método</p>
+          <h2 className="mb-12 max-w-xl text-3xl font-semibold tracking-tight text-ink">
+            Aprendés operando, no mirando teoría
+          </h2>
+          <ol className="grid gap-10 md:grid-cols-3 md:gap-8">
+            {[
+              ["Traders rentables", "Te enseñan personas con años de experiencia real en el mercado, no presentadores."],
+              ["Consultas personalizadas", "Respondemos tus dudas y revisamos tus operaciones durante todo el proceso."],
+              ["Comunidad activa", "Un grupo privado de traders para seguir las novedades del mercado día a día."],
+            ].map(([titulo, texto], i) => (
+              <li key={titulo} className="border-t border-line-strong pt-5">
+                <span className="mb-3 block font-mono text-sm text-accent">0{i + 1}</span>
+                <h3 className="mb-2 text-lg font-semibold text-ink">{titulo}</h3>
+                <p className="leading-relaxed text-muted">{texto}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
 
       {/* CURSOS */}
-      <section id="cursos" className="py-20 bg-black">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-extrabold mb-4 text-white">Nuestros Cursos</h2>
-            <p className="text-gray-300 max-w-2xl mx-auto">Elige el programa que mejor se adapte a tus necesidades y objetivos.</p>
+      <section id="cursos" className="border-b border-line py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <p className="eyebrow mb-3">Cursos</p>
+              <h2 className="text-3xl font-semibold tracking-tight text-ink">Elegí tu programa</h2>
+            </div>
+            <p className="max-w-sm text-muted">Pago único, acceso de por vida y certificado al terminar.</p>
           </div>
           {loadingCursos ? (
-            <p className="text-white text-center">Cargando cursos...</p>
+            <div className="grid gap-6 md:grid-cols-3" aria-busy="true" aria-label="Cargando cursos">
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="panel h-[380px] animate-pulse p-7">
+                  <div className="mb-4 h-5 w-2/3 rounded bg-surface-2" />
+                  <div className="mb-2 h-4 rounded bg-surface-2" />
+                  <div className="mb-8 h-4 w-1/2 rounded bg-surface-2" />
+                  <div className="h-8 w-24 rounded bg-surface-2" />
+                </div>
+              ))}
+            </div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid gap-6 md:grid-cols-3">
               {cursos.map((curso) => (
-                <div
+                <article
                   key={curso.id}
-                  className={`curso-card p-7 relative card-hover transition-all duration-300 ${curso.destacado ? "border-2 border-indigo-700 shadow-xl z-10" : ""}`}
+                  className={`relative flex flex-col rounded-lg border bg-surface p-7 transition-colors ${
+                    curso.destacado ? "border-accent" : "border-line hover:border-line-strong"
+                  }`}
                 >
                   {curso.destacado && (
-                    <span className="absolute -top-5 left-4 badge-popular text-xs py-1 px-4 rounded-full font-bold shadow-lg">
-                      Destacado
+                    <span className="absolute -top-3 left-6 rounded-sm bg-accent px-2.5 py-1 font-mono text-[11px] font-medium uppercase tracking-wider text-accent-ink">
+                      Más elegido
                     </span>
                   )}
-                  <h3 className="font-bold text-xl mb-2 text-indigo-900">{curso.nombre}</h3>
-                  <p className="mb-4 text-gray-700">{curso.descripcion}</p>
-                  <span className="inline-block badge-basic font-bold px-4 py-1 rounded-lg text-sm mb-2">
-                    Nivel: {curso.nivel}
-                  </span>
-                  <ul className="mb-4 mt-2 text-sm text-gray-800 list-disc pl-4">
-                    {curso.beneficios?.map((b, i) => <li key={i}>{b}</li>)}
+                  <p className="mb-3 font-mono text-xs uppercase tracking-wider text-faint">Nivel {curso.nivel}</p>
+                  <h3 className="mb-2 text-xl font-semibold text-ink">{curso.nombre}</h3>
+                  <p className="mb-6 leading-relaxed text-muted">{curso.descripcion}</p>
+                  <ul className="mb-8 space-y-2.5 text-sm text-ink">
+                    {curso.beneficios?.map((b, i) => (
+                      <li key={i} className="flex gap-2.5">
+                        <svg className="mt-0.5 h-4 w-4 flex-none text-accent" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                          <path d="M3 8.5l3 3 7-7" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        {b}
+                      </li>
+                    ))}
                   </ul>
-                  <div className="flex items-center mb-4">
-                    <span className="text-2xl font-bold text-indigo-700 mr-1">${curso.precio}</span>
-                    <span className="text-gray-400 text-md font-semibold">/pago único</span>
+                  <div className="mt-auto">
+                    <div className="mb-5 flex items-baseline gap-2">
+                      <span className="font-mono text-3xl font-medium tabular-nums text-ink">${curso.precio}</span>
+                      <span className="text-sm text-faint">pago único</span>
+                    </div>
+                    <button
+                      onClick={() => handleComprar(curso)}
+                      className={`w-full ${curso.destacado ? "btn-primary" : "btn-secondary"}`}
+                    >
+                      Comprar curso
+                    </button>
                   </div>
-                  <button onClick={() => handleComprar(curso)} className="w-full btn-gradient font-bold py-2 px-4 rounded">
-                    Comprar Ahora
-                  </button>
-                </div>
+                </article>
               ))}
             </div>
           )}
@@ -381,65 +421,71 @@ export default function Home() {
 
       {/* MODAL DE COMPRA */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[3px]">
-          <div className="relative w-full max-w-md bg-white rounded-xl shadow-xl animate-fadein flex flex-col max-h-[95vh] min-h-[400px] my-6">
-            <button onClick={() => setShowModal(false)} className="absolute top-4 right-5 text-2xl text-gray-400 hover:text-indigo-700">×</button>
-            <div className="pt-6 pb-2 px-4 sm:px-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Completa tu compra</h2>
-              <div className="font-bold text-lg text-gray-900 mb-1">
-                Curso Seleccionado:{" "}
-                <span className="text-indigo-700 underline">{cursoSeleccionado.nombre}</span>
-              </div>
-              <div className="text-gray-700 text-base">
-                Precio: <span className="font-bold">${cursoSeleccionado.precio}</span> (pago único)
-              </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="compra-titulo"
+            className="panel animate-fadein relative flex max-h-[95vh] w-full max-w-md flex-col shadow-2xl"
+          >
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-md text-muted hover:bg-surface-2 hover:text-ink"
+              aria-label="Cerrar"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+            </button>
+            <div className="border-b border-line px-6 pb-5 pt-6">
+              <p className="eyebrow mb-2">Completa tu compra</p>
+              <h2 id="compra-titulo" className="mb-1 pr-8 text-2xl font-semibold text-ink">{cursoSeleccionado.nombre}</h2>
+              <p className="text-muted">
+                <span className="font-mono tabular-nums text-ink">${cursoSeleccionado.precio}</span> · pago único
+              </p>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 py-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block font-bold mb-1 text-gray-900" htmlFor="nombre">Nombre completo</label>
-                  <input type="text" id="nombre" name="nombre" required className="w-full border rounded px-4 py-2 text-gray-900 font-medium focus:outline-indigo-700" value={form.nombre} onChange={handleInput} autoComplete="name" />
+                  <label className="field-label" htmlFor="nombre">Nombre completo</label>
+                  <input type="text" id="nombre" name="nombre" required className="field" value={form.nombre} onChange={handleInput} autoComplete="name" />
                 </div>
                 <div>
-                  <label className="block font-bold mb-1 text-gray-900" htmlFor="email">Correo electrónico</label>
-                  <input type="email" id="email" name="email" required className="w-full border rounded px-4 py-2 text-gray-900 font-medium focus:outline-indigo-700" value={form.email} onChange={handleInput} autoComplete="email" />
-                  <div className="text-xs text-gray-500 pl-1 mt-1">Este email se usará para acceder a la plataforma de estudio.</div>
+                  <label className="field-label" htmlFor="email">Correo electrónico</label>
+                  <input type="email" id="email" name="email" required className="field" value={form.email} onChange={handleInput} autoComplete="email" />
+                  <p className="mt-1.5 text-xs text-faint">Lo usarás para entrar a la plataforma.</p>
                 </div>
                 <div>
-                  <label className="block font-bold mb-1 text-gray-900" htmlFor="password">Contraseña</label>
-                  <input type="password" id="password" name="password" required className="w-full border rounded px-4 py-2 text-gray-900 font-medium focus:outline-indigo-700" value={form.password} onChange={handleInput} autoComplete="new-password" />
-                  <div className="text-xs text-gray-500 pl-1 mt-1">Esta contraseña te servirá para iniciar sesión en tu cuenta de estudiante.</div>
+                  <label className="field-label" htmlFor="password">Contraseña</label>
+                  <input type="password" id="password" name="password" required className="field" value={form.password} onChange={handleInput} autoComplete="new-password" />
+                  <p className="mt-1.5 text-xs text-faint">La contraseña de tu cuenta de alumno.</p>
                 </div>
                 <div>
-                  <label className="block font-bold mb-1 text-gray-900">Método de pago</label>
-                  <select name="metodo" className="w-full border rounded px-4 py-2 text-gray-900 font-medium focus:outline-indigo-700" value={form.metodo} onChange={handleInput}>
+                  <label className="field-label" htmlFor="metodo">Método de pago</label>
+                  <select id="metodo" name="metodo" className="field" value={form.metodo} onChange={handleInput}>
                     <option>PayPal</option>
                     <option>Transferencia USDT</option>
                   </select>
                 </div>
                 {form.metodo === "Transferencia USDT" && (
-                  <div className="bg-yellow-50 border-l-4 border-yellow-400 rounded-xl p-5 text-sm mb-2 shadow flex flex-col gap-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-indigo-900 text-base">
-                        Transferencia en USDT • <span className="font-medium">TRON (TRC20)</span>
-                      </span>
-                    </div>
+                  <div className="space-y-4 rounded-md border border-line-strong bg-surface-2 p-4 text-sm">
+                    <p className="font-medium text-ink">
+                      USDT · red <span className="font-mono">TRON (TRC20)</span>
+                    </p>
                     <div>
-                      <span className="font-bold text-indigo-900">Dirección de depósito:</span>
+                      <span className="field-label">Dirección de depósito</span>
                       <a href="https://tronscan.org/" target="_blank" rel="noopener noreferrer"
-                        className="ml-2 px-2 py-1 bg-indigo-50 text-indigo-900 rounded-lg font-mono text-xs underline hover:bg-indigo-100 break-all transition">
+                        className="block break-all rounded border border-line bg-bg px-3 py-2 font-mono text-xs text-accent hover:border-accent">
                         TBJzaDGosSyhtUPC7BkH9TMgGQDMAC3U6K
                       </a>
                     </div>
                     <div>
-                      <span className="font-bold text-indigo-900">ID de Transacción / TXID:</span>
-                      <input type="text" name="txid" className="w-full mt-1 border border-indigo-200 rounded px-3 py-1 text-gray-900 font-mono font-medium bg-white focus:border-indigo-500" placeholder="Pega tu TXID aquí" value={form.txid} onChange={handleInput} />
+                      <label className="field-label" htmlFor="txid">ID de transacción (TXID)</label>
+                      <input type="text" id="txid" name="txid" className="field font-mono text-sm" placeholder="Pega tu TXID aquí" value={form.txid} onChange={handleInput} />
                     </div>
                   </div>
                 )}
-                <div className="w-full flex gap-4 mt-2 flex-col md:flex-row">
-                  <button type="button" className="bg-gray-200 text-gray-900 rounded px-6 py-2 font-bold hover:bg-gray-300 transition" onClick={() => setShowModal(false)}>Cancelar</button>
-                  <button type="submit" disabled={enviando} className="bg-indigo-900 text-white rounded px-6 py-2 font-bold hover:bg-indigo-700 transition">{enviando ? "Procesando..." : "Confirmar Compra"}</button>
+                <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+                  <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
+                  <button type="submit" disabled={enviando} className="btn-primary">{enviando ? "Procesando…" : "Confirmar compra"}</button>
                 </div>
               </form>
             </div>
@@ -447,104 +493,103 @@ export default function Home() {
         </div>
       )}
 
-{/* TESTIMONIOS */}
-<section id="testimonios" className="py-20 bg-gray-50">
-  <div className="max-w-6xl mx-auto px-4">
-    <div className="text-center mb-16">
-      <h2 className="text-3xl font-extrabold mb-4 text-gray-800">
-        Historias de Éxito
-      </h2>
-      <p className="text-gray-600 max-w-2xl mx-auto">
-        Lo que nuestros estudiantes dicen sobre Atlax
-      </p>
-    </div>
-    <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
-      {testimonios.map((t, i) => (
-        <div
-          key={i}
-          className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center text-center transition-transform hover:scale-105"
-        >
-          <img
-            src={t.img}
-            alt={t.nombre}
-            className="rounded-full w-20 h-20 mb-4 ring-4 ring-indigo-100 shadow-md"
-          />
-          <h3 className="font-bold text-xl mb-1 text-gray-900">{t.nombre}</h3>
-          <p className="text-gray-500 text-sm mb-4 font-medium">{t.rol}</p>
-          {/* Texto con comillas normales al inicio y final (sin absolute) */}
-          <p className="text-gray-700 italic relative">
-            <span className="text-indigo-400 text-2xl mr-1">&ldquo;</span>
-            {t.texto}
-            <span className="text-indigo-400 text-2xl ml-1">&rdquo;</span>
-          </p>
-        </div>
-      ))}
-    </div>
-  </div>
-</section>
-
-
-      {/* CONTACTO */}
-      <section id="contacto" className="py-20 gradient-bg text-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-extrabold mb-4">¿Listo para Transformar tu Trading?</h2>
-            <p className="opacity-90 max-w-2xl mx-auto">Déjanos tus datos y nos pondremos en contacto contigo para resolver todas tus dudas.</p>
+      {/* TESTIMONIOS */}
+      <section id="testimonios" className="border-b border-line py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <p className="eyebrow mb-3">Alumnos</p>
+          <h2 className="mb-12 text-3xl font-semibold tracking-tight text-ink">Lo que dicen quienes ya operan</h2>
+          <div className="grid gap-10 md:grid-cols-3 md:gap-8">
+            {testimonios.map((t) => (
+              <figure key={t.nombre} className="flex flex-col border-t border-line-strong pt-6">
+                <blockquote className="mb-6 flex-1 text-lg leading-relaxed text-ink">
+                  &ldquo;{t.texto}&rdquo;
+                </blockquote>
+                <figcaption className="flex items-center gap-3">
+                  <img src={t.img} alt="" width={40} height={40} loading="lazy" className="h-10 w-10 rounded-full grayscale" />
+                  <div>
+                    <div className="text-sm font-semibold text-ink">{t.nombre}</div>
+                    <div className="text-sm text-faint">{t.rol}</div>
+                  </div>
+                </figcaption>
+              </figure>
+            ))}
           </div>
-          <div className="max-w-xl mx-auto bg-[#181d2a] bg-opacity-95 rounded-lg shadow-lg p-8">
-            <form className="space-y-6">
-              <input type="text" placeholder="Tu nombre completo" className="w-full border rounded px-4 py-2 bg-white text-black" />
-              <input type="email" placeholder="Tu correo electrónico" className="w-full border rounded px-4 py-2 bg-white text-black" />
-              <textarea placeholder="Cuéntanos tu objetivo" className="w-full border rounded px-4 py-2 bg-white text-black" />
-              <button type="submit" className="btn-gradient font-bold w-full py-2 rounded mt-2">Enviar mensaje</button>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA FINAL */}
-      <section className="py-16 bg-black text-white">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-extrabold mb-6">Empieza Tu Viaje en el Trading Hoy</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">Únete a miles de traders que han transformado sus resultados con nuestros cursos.</p>
-          <a href="#cursos" className="btn-gradient font-bold py-3 px-8 rounded-lg shadow-lg inline-block">¡Quiero Empezar!</a>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-extrabold mb-4 text-gray-700">Preguntas Frecuentes</h2>
-            <p className="text-gray-600">Resolvemos tus dudas más comunes sobre nuestros cursos.</p>
+      <section id="faq" className="border-b border-line py-20">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 md:grid-cols-[1fr_2fr]">
+          <div>
+            <p className="eyebrow mb-3">Preguntas</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-ink">Preguntas frecuentes</h2>
           </div>
-          <div className="space-y-6">
+          <div className="border-t border-line">
             {faqs.map((faq, i) => (
-              <details key={i} className="p-4 rounded-lg shadow bg-white group" open={i === 0}>
-                <summary className="font-bold text-indigo-900 cursor-pointer text-lg group-open:mb-2">
+              <details key={i} className="group border-b border-line" open={i === 0}>
+                <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-4 py-4 text-lg font-medium text-ink [&::-webkit-details-marker]:hidden">
                   {faq.pregunta}
+                  <svg className="h-5 w-5 flex-none text-muted transition-transform group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
                 </summary>
-                <div className="text-gray-700">{faq.respuesta}</div>
+                <p className="pb-5 pr-10 leading-relaxed text-muted">{faq.respuesta}</p>
               </details>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-black text-white pt-16 pb-8">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-10">
-          <div className="flex flex-col items-center md:items-start">
-            <span className="text-2xl font-extrabold text-[#5b47db] mb-2">ATLAX</span>
-            <p className="text-gray-400 max-w-xs">Cursos de trading diseñados para transformar tu educación financiera y potenciar tus resultados en los mercados.</p>
+      {/* CONTACTO */}
+      <section id="contacto" className="py-20">
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 md:grid-cols-2">
+          <div>
+            <p className="eyebrow mb-3">Contacto</p>
+            <h2 className="mb-4 text-3xl font-semibold tracking-tight text-ink">¿Listo para transformar tu trading?</h2>
+            <p className="max-w-md leading-relaxed text-muted">
+              Dejanos tus datos y te ayudamos a elegir el programa que encaja con tu nivel.
+            </p>
           </div>
-          <ul className="flex gap-8 font-bold">
-            <li><a href="#inicio" className="hover:text-indigo-300">Inicio</a></li>
-            <li><a href="#cursos" className="hover:text-indigo-300">Cursos</a></li>
-            <li><a href="#testimonios" className="hover:text-indigo-300">Testimonios</a></li>
-            <li><a href="#contacto" className="hover:text-indigo-300">Contacto</a></li>
+          <form className="panel space-y-5 p-6 sm:p-8">
+            <div>
+              <label className="field-label" htmlFor="contacto-nombre">Nombre completo</label>
+              <input id="contacto-nombre" type="text" autoComplete="name" className="field" />
+            </div>
+            <div>
+              <label className="field-label" htmlFor="contacto-email">Correo electrónico</label>
+              <input id="contacto-email" type="email" autoComplete="email" className="field" />
+            </div>
+            <div>
+              <label className="field-label" htmlFor="contacto-objetivo">¿Cuál es tu objetivo?</label>
+              <textarea id="contacto-objetivo" rows={4} className="field resize-y" />
+            </div>
+            <button type="submit" className="btn-primary w-full">Enviar mensaje</button>
+          </form>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-line py-12">
+        <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 sm:px-6 md:flex-row md:items-start md:justify-between">
+          <div>
+            <span className="flex items-center gap-2 font-mono text-lg font-medium tracking-[0.2em] text-ink">
+              <span className="inline-block h-2.5 w-2.5 rounded-[2px] bg-accent" aria-hidden="true" />
+              ATLAX
+            </span>
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">
+              Cursos de trading para que operes con método y gestión de riesgo.
+            </p>
+          </div>
+          <ul className="grid grid-cols-2 gap-x-10 gap-y-1 text-sm sm:flex sm:gap-2">
+            {navLinks.map((l) => (
+              <li key={l.href}>
+                <a href={l.href} className="inline-block py-2.5 text-muted hover:text-ink sm:px-2">{l.label}</a>
+              </li>
+            ))}
           </ul>
-          <div className="text-gray-400 text-xs mt-4 md:mt-0">© {new Date().getFullYear()} ATLAX. Todos los derechos reservados.</div>
+        </div>
+        <div className="mx-auto mt-8 max-w-6xl px-4 font-mono text-xs text-faint sm:px-6">
+          © {new Date().getFullYear()} ATLAX. Todos los derechos reservados.
         </div>
       </footer>
     </>
