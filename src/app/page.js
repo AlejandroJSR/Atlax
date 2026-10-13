@@ -158,6 +158,7 @@ export default function Home() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginLoading(true);
+    setLoginError("");
 
     try {
       const { user } = await signInWithEmailAndPassword(
@@ -190,10 +191,9 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error en login:", error);
-      setLoginError("Usuario o contraseña incorrectos.");
+      setLoginError("Correo o contraseña incorrectos. Revisá los datos e intentá de nuevo.");
     } finally {
       setLoginLoading(false);
-      setShowLogin(false);
     }
   };
 
@@ -259,27 +259,43 @@ export default function Home() {
 
       {/* MODAL LOGIN */}
       {showLogin && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
-          <div className="relative bg-white/70 backdrop-blur-xl rounded-xl shadow-xl w-full max-w-xs p-7 z-10">
-            <button className="absolute top-3 right-3 text-gray-400 hover:text-red-600" onClick={() => setShowLogin(false)}>
-              <span className="text-xl">&times;</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowLogin(false)} />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="login-titulo"
+            className="panel animate-fadein relative z-10 w-full max-w-sm p-7 shadow-2xl"
+          >
+            <button
+              className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-md text-muted hover:bg-surface-2 hover:text-ink"
+              onClick={() => setShowLogin(false)}
+              aria-label="Cerrar"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
             </button>
-            <h2 className="text-xl font-bold text-indigo-900 mb-4 text-center">Acceso alumnos</h2>
-            <form className="flex flex-col gap-3" onSubmit={handleLogin}>
-              <input type="email" name="email" required className="border rounded px-3 py-2 text-gray-900"
-                placeholder="Correo electrónico" value={loginForm.email} onChange={handleLoginInput} />
-              <input type="password" name="password" required className="border rounded px-3 py-2 text-gray-900"
-                placeholder="Contraseña" value={loginForm.password} onChange={handleLoginInput} />
-              <button type="submit" className="bg-indigo-700 hover:bg-indigo-900 text-white font-bold py-2 rounded mt-2"
-                disabled={loginLoading}>
-                {loginLoading ? "Ingresando..." : "Ingresar"}
+            <h2 id="login-titulo" className="mb-1 text-xl font-semibold text-ink">Acceso alumnos</h2>
+            <p className="mb-6 text-sm text-muted">Solo para cuentas aprobadas.</p>
+            <form className="space-y-4" onSubmit={handleLogin}>
+              <div>
+                <label className="field-label" htmlFor="login-email">Correo electrónico</label>
+                <input id="login-email" type="email" name="email" required autoComplete="email" className="field"
+                  value={loginForm.email} onChange={handleLoginInput} />
+              </div>
+              <div>
+                <label className="field-label" htmlFor="login-password">Contraseña</label>
+                <input id="login-password" type="password" name="password" required autoComplete="current-password" className="field"
+                  value={loginForm.password} onChange={handleLoginInput} />
+              </div>
+              {loginError && (
+                <p role="alert" className="rounded-md border border-down/40 bg-down/10 px-3 py-2 text-sm text-down">
+                  {loginError}
+                </p>
+              )}
+              <button type="submit" className="btn-primary w-full" disabled={loginLoading}>
+                {loginLoading ? "Ingresando…" : "Ingresar"}
               </button>
-              {loginError && <div className="text-red-600 text-xs mt-1 text-center">{loginError}</div>}
             </form>
-            <div className="text-gray-700 text-xs text-center mt-3">
-              El acceso solo está habilitado para cuentas aprobadas.
-            </div>
           </div>
         </div>
       )}
