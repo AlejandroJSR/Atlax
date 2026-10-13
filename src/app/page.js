@@ -209,7 +209,7 @@ export default function Home() {
     <>
       {/* NAVBAR */}
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-line bg-bg/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6">
           <a href="#inicio" className="flex items-center gap-2 font-mono text-lg font-medium tracking-[0.2em] text-ink">
             <span className="inline-block h-2.5 w-2.5 rounded-[2px] bg-accent" aria-hidden="true" />
             ATLAX
@@ -290,11 +290,11 @@ export default function Home() {
         className="relative overflow-hidden border-b border-line pt-16"
         style={{
           backgroundImage:
-            "radial-gradient(60% 50% at 75% 40%, rgba(198,244,50,0.08), transparent 70%), linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px)",
+            "radial-gradient(60% 50% at 75% 40%, rgba(91,71,219,0.14), transparent 70%), linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px)",
           backgroundSize: "auto, 48px 48px, 48px 48px",
         }}
       >
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-[1.1fr_1fr] md:py-28">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-[1.1fr_1fr] md:py-28">
           <div className="animate-fadeInUp">
             <p className="eyebrow mb-5">Escuela de trading Forex</p>
             <h1 className="mb-6 text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
@@ -331,7 +331,7 @@ export default function Home() {
 
       {/* MÉTODO */}
       <section id="metodo" className="border-b border-line py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <p className="eyebrow mb-3">Método</p>
           <h2 className="mb-12 max-w-xl text-3xl font-semibold tracking-tight text-ink">
             Aprendés operando, no mirando teoría
@@ -343,7 +343,7 @@ export default function Home() {
               ["Comunidad activa", "Un grupo privado de traders para seguir las novedades del mercado día a día."],
             ].map(([titulo, texto], i) => (
               <li key={titulo} className="border-t border-line-strong pt-5">
-                <span className="mb-3 block font-mono text-sm text-accent">0{i + 1}</span>
+                <span className="mb-3 block font-mono text-sm text-accent-soft">0{i + 1}</span>
                 <h3 className="mb-2 text-lg font-semibold text-ink">{titulo}</h3>
                 <p className="leading-relaxed text-muted">{texto}</p>
               </li>
@@ -354,7 +354,7 @@ export default function Home() {
 
       {/* CURSOS */}
       <section id="cursos" className="border-b border-line py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
               <p className="eyebrow mb-3">Cursos</p>
@@ -393,7 +393,7 @@ export default function Home() {
                   <ul className="mb-8 space-y-2.5 text-sm text-ink">
                     {curso.beneficios?.map((b, i) => (
                       <li key={i} className="flex gap-2.5">
-                        <svg className="mt-0.5 h-4 w-4 flex-none text-accent" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <svg className="mt-0.5 h-4 w-4 flex-none text-accent-soft" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                           <path d="M3 8.5l3 3 7-7" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         {b}
@@ -473,7 +473,7 @@ export default function Home() {
                     <div>
                       <span className="field-label">Dirección de depósito</span>
                       <a href="https://tronscan.org/" target="_blank" rel="noopener noreferrer"
-                        className="block break-all rounded border border-line bg-bg px-3 py-2 font-mono text-xs text-accent hover:border-accent">
+                        className="block break-all rounded border border-line bg-bg px-3 py-2 font-mono text-xs text-accent-soft hover:border-accent">
                         TBJzaDGosSyhtUPC7BkH9TMgGQDMAC3U6K
                       </a>
                     </div>
@@ -495,7 +495,7 @@ export default function Home() {
 
       {/* TESTIMONIOS */}
       <section id="testimonios" className="border-b border-line py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <p className="eyebrow mb-3">Alumnos</p>
           <h2 className="mb-12 text-3xl font-semibold tracking-tight text-ink">Lo que dicen quienes ya operan</h2>
           <div className="grid gap-10 md:grid-cols-3 md:gap-8">
@@ -519,7 +519,7 @@ export default function Home() {
 
       {/* FAQ */}
       <section id="faq" className="border-b border-line py-20">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 md:grid-cols-[1fr_2fr]">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 md:grid-cols-[1fr_2fr]">
           <div>
             <p className="eyebrow mb-3">Preguntas</p>
             <h2 className="text-3xl font-semibold tracking-tight text-ink">Preguntas frecuentes</h2>
@@ -542,7 +542,7 @@ export default function Home() {
 
       {/* CONTACTO */}
       <section id="contacto" className="py-20">
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 md:grid-cols-2">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 md:grid-cols-2">
           <div>
             <p className="eyebrow mb-3">Contacto</p>
             <h2 className="mb-4 text-3xl font-semibold tracking-tight text-ink">¿Listo para transformar tu trading?</h2>
@@ -570,7 +570,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer className="border-t border-line py-12">
-        <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 sm:px-6 md:flex-row md:items-start md:justify-between">
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 sm:px-6 md:flex-row md:items-start md:justify-between">
           <div>
             <span className="flex items-center gap-2 font-mono text-lg font-medium tracking-[0.2em] text-ink">
               <span className="inline-block h-2.5 w-2.5 rounded-[2px] bg-accent" aria-hidden="true" />
@@ -588,7 +588,7 @@ export default function Home() {
             ))}
           </ul>
         </div>
-        <div className="mx-auto mt-8 max-w-6xl px-4 font-mono text-xs text-faint sm:px-6">
+        <div className="mx-auto mt-8 max-w-7xl px-4 font-mono text-xs text-faint sm:px-6">
           © {new Date().getFullYear()} ATLAX. Todos los derechos reservados.
         </div>
       </footer>

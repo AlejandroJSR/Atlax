@@ -1,19 +1,21 @@
 @import "tailwindcss";
 
-/* ATLAX design tokens: terminal de trading.
-   Casi negro, un solo acento (lima), verde/rojo reservados para subidas y bajadas. */
+/* ATLAX design tokens. Marca: violeta original #5b47db.
+   Casi negro, un solo acento violeta; verde/rojo reservados para subidas y bajadas.
+   --accent para rellenos y bordes (texto blanco encima), --accent-soft para texto sobre fondo oscuro. */
 :root {
-  --bg: #0a0c0f;
-  --surface: #111418;
-  --surface-2: #181c22;
-  --line: #262b33;
-  --line-strong: #353b45;
+  --bg: #0b0b10;
+  --surface: #121219;
+  --surface-2: #1a1a23;
+  --line: #272733;
+  --line-strong: #363645;
   --ink: #e6e8eb;
   --muted: #9aa3ae;
   --faint: #6b7380;
-  --accent: #c6f432;
-  --accent-hover: #d6ff5c;
-  --accent-ink: #0a0c0f;
+  --accent: #5b47db;
+  --accent-hover: #4a37c4;
+  --accent-soft: #a99cff;
+  --accent-ink: #ffffff;
   --up: #3ddc84;
   --down: #ff5c5c;
   --warn: #f5b041;
@@ -31,6 +33,7 @@
   --color-faint: var(--faint);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
   --color-accent-ink: var(--accent-ink);
   --color-up: var(--up);
   --color-down: var(--down);
@@ -55,8 +58,14 @@ h1, h2, h3 {
   text-wrap: balance;
 }
 
+/* Widgets de terceros (TradingView, fxverify) usan fondo transparente: si el
+   color-scheme del iframe no coincide con el de su documento, Chrome lo pinta blanco. */
+iframe {
+  color-scheme: normal;
+}
+
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-soft);
   outline-offset: 2px;
 }
 
@@ -84,7 +93,7 @@ h1, h2, h3 {
     @apply rounded-lg border border-line bg-surface;
   }
   .eyebrow {
-    @apply font-mono text-xs uppercase tracking-[0.14em] text-accent;
+    @apply font-mono text-xs uppercase tracking-[0.14em] text-accent-soft;
   }
   .data-table {
     @apply w-full text-left text-sm;
@@ -130,7 +139,7 @@ h1, h2, h3 {
 .prose-clase h2 { font-size: 1.5rem; }
 .prose-clase h3 { font-size: 1.25rem; }
 .prose-clase p { margin: 0 0 1em; }
-.prose-clase a { color: var(--accent); text-decoration: underline; }
+.prose-clase a { color: var(--accent-soft); text-decoration: underline; }
 .prose-clase ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 1em; }
 .prose-clase ol { list-style: decimal; padding-left: 1.25rem; margin-bottom: 1em; }
 .prose-clase img { border-radius: 0.375rem; max-width: 100%; }
