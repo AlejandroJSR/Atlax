@@ -1,6 +1,9 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
+import { auth } from "@/services/firebase";
 
 export default function AlumnosLayout({ children }) {
   const router = useRouter();
@@ -11,9 +14,14 @@ export default function AlumnosLayout({ children }) {
     if (!alumno) router.push("/");
   }, [router]);
 
-  const logout = () => {
-    sessionStorage.removeItem("alumno");
-    router.push("/");
+  const logout = async () => {
+    try {
+      await signOut(auth); // Cierra sesión real en Firebase
+      sessionStorage.removeItem("alumno");
+      router.push("/"); // Redirige a la landing
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
   };
 
   return (

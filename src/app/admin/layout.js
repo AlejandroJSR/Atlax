@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { signOut, onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/services/firebase";
 
 const menuItems = [
   { icon: "📄", label: "Cursos Vendidos", href: "/admin/cursos-vendidos" },
@@ -11,6 +14,23 @@ const menuItems = [
 
 export default function AdminLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const router = useRouter();
+
+  // --- Verificar sesión activa ---
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push("/"); // si no hay sesión, enviar a landing
+      }
+    });
+    return () => unsub();
+  }, [router]);
+
+  const handleLogout = async () => {
+    await signOut(auth); // cerrar sesión de Firebase
+    sessionStorage.removeItem("logueado");
+    router.push("/"); // redirigir a landing
+  };
 
   return (
     <div className="flex min-h-screen bg-[#f7f8fa] relative">
@@ -84,10 +104,7 @@ export default function AdminLayout({ children }) {
           {sidebarOpen ? (
             <button
               className="bg-white text-[#2d249c] rounded px-3 py-2 font-bold text-xs hover:bg-violet-100 transition flex items-center gap-2"
-              onClick={() => {
-                sessionStorage.removeItem("logueado");
-                window.location.href = "/login";
-              }}
+              onClick={handleLogout}
             >
               <svg
                 className="w-4 h-4"
@@ -108,10 +125,7 @@ export default function AdminLayout({ children }) {
             <button
               className="bg-white text-[#2d249c] rounded-full p-2 hover:bg-violet-100 transition flex items-center justify-center"
               title="Salir"
-              onClick={() => {
-                sessionStorage.removeItem("logueado");
-                window.location.href = "/login";
-              }}
+              onClick={handleLogout}
             >
               <svg
                 className="w-6 h-6"

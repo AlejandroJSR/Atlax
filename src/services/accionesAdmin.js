@@ -19,31 +19,34 @@ export const cambiarEstadoCompra = async (compra, nuevoEstado) => {
   const cursoDoc = querySnap.docs[0];
   const cursoId = cursoDoc.id;
 
-  // 3. Referencia del usuario
-  const userRef = doc(db, "usuarios", compra.email);
+  // 3. Referencia del usuario (por UID, no por email)
+  const userRef = doc(db, "usuarios", compra.uid);
   const userSnap = await getDoc(userRef);
+
+  const cursoAprobado = {
+    cursoId,
+    nombre: cursoDoc.data().nombre,
+    fechaAprobacion: new Date().toISOString(),
+    metodo: compra.metodo,
+    txid: compra.txid
+  };
 
   // --- CASO: APROBAR ---
   if (nuevoEstado === "APROBADO") {
-    const cursoAprobado = {
-      cursoId,
-      nombre: cursoDoc.data().nombre,
-      fechaAprobacion: new Date().toISOString(),
-      metodo: compra.metodo,
-      txid: compra.txid
-    };
-
     if (userSnap.exists()) {
       const data = userSnap.data();
       const cursos = data.cursos || [];
       if (!cursos.find(c => c.cursoId === cursoId)) {
-        await updateDoc(userRef, { cursos: [...cursos, cursoAprobado] });
+        await updateDoc(userRef, { cursos: [...cursos, cursoAprobado], estado: "APROBADO" });
       }
     } else {
       await setDoc(userRef, {
         nombre: compra.nombre,
         email: compra.email,
-        cursos: [cursoAprobado]
+        rol: "alumno",
+        estado: "APROBADO",
+        cursos: [cursoAprobado],
+        creadoEn: new Date()
       });
     }
   }
@@ -53,6 +56,6 @@ export const cambiarEstadoCompra = async (compra, nuevoEstado) => {
     const data = userSnap.data();
     const cursos = data.cursos || [];
     const cursosFiltrados = cursos.filter(c => c.cursoId !== cursoId);
-    await updateDoc(userRef, { cursos: cursosFiltrados });
+    await updateDoc(userRef, { cursos: cursosFiltrados, estado: "PENDIENTE" });
   }
 };

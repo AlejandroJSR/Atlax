@@ -1,12 +1,15 @@
 "use client";
-import React, { useEffect, useState, useMemo } from "react";
+export const dynamic = "force-dynamic";
+
+import React, { useEffect, useState } from "react";
 import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 function transformarContenidoHTML(html) {
-  if (!html) return "<p>Sin contenido</p>";
+  if (typeof window === "undefined" || !html) return "<p>Sin contenido</p>";
+
   const parser = new DOMParser();
   const docHtml = parser.parseFromString(html, "text/html");
 
@@ -47,8 +50,9 @@ const ContenidoClase = React.memo(({ html }) => (
     dangerouslySetInnerHTML={{ __html: html }}
   />
 ));
+ContenidoClase.displayName = "ContenidoClase";
 
-export default function AlumnosPage() {
+function AlumnosPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
@@ -63,6 +67,8 @@ export default function AlumnosPage() {
   const [editNota, setEditNota] = useState(false);
   const [mensajeNota, setMensajeNota] = useState("");
 
+  const [contenidoClase, setContenidoClase] = useState("<p>Cargando...</p>");
+
   useEffect(() => {
     if (!loading && !user) router.push("/");
   }, [user, loading, router]);
@@ -72,7 +78,7 @@ export default function AlumnosPage() {
     if (!user) return;
     const cargarCursosAprobados = async () => {
       setLoadingCursos(true);
-      const usuarioRef = doc(db, "usuarios", user.email);
+      const usuarioRef = doc(db, "usuarios", user.uid);
       const usuarioSnap = await getDoc(usuarioRef);
       if (!usuarioSnap.exists()) {
         setCursos([]);
@@ -117,7 +123,7 @@ export default function AlumnosPage() {
       setEditNota(false);
     };
     if (vista === "clase") cargarNota();
-  }, [vista, claseActiva]);
+  }, [vista, claseActiva, user]);
 
   const guardarNota = async () => {
     if (!user || !getClaseKey()) return;
@@ -164,7 +170,14 @@ export default function AlumnosPage() {
       }
     };
     if (vista === "clase") cargarContenidoClase();
-  }, [vista, claseActiva]);
+  }, [vista, claseActiva, cursoActivo, moduloActivo, cursos]);
+
+  useEffect(() => {
+    const html =
+      cursoActivo?.modulos?.[moduloActivo]?.clases?.[claseActiva]?.contenido ||
+      "<p>Cargando...</p>";
+    setContenidoClase(transformarContenidoHTML(html));
+  }, [cursoActivo?.id, moduloActivo, claseActiva]);
 
   const BotonVolver = ({ onClick, texto }) => (
     <button
@@ -173,15 +186,6 @@ export default function AlumnosPage() {
     >
       ← {texto}
     </button>
-  );
-
-  const contenidoClase = useMemo(
-    () =>
-      transformarContenidoHTML(
-        cursoActivo?.modulos?.[moduloActivo]?.clases?.[claseActiva]?.contenido ||
-          "<p>Cargando...</p>"
-      ),
-    [cursoActivo?.id, moduloActivo, claseActiva]
   );
 
   if (!user) return null;
@@ -401,3 +405,5 @@ export default function AlumnosPage() {
     </main>
   );
 }
+
+export default AlumnosPage;

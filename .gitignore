@@ -23,3 +23,6 @@ Thumbs.db
 
 # Archivos de Firebase CLI
 .firebase/
+
+# Backups comprimidos
+*.zip
