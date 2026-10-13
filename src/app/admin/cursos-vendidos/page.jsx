@@ -67,161 +67,126 @@ export default function CursosVendidosPage() {
     setTimeout(() => setCopiedFirebaseId(null), 1500);
   };
 
-  if (loading) return <p className="text-gray-700">Cargando ventas...</p>;
+  if (loading) return <p className="text-muted">Cargando ventas…</p>;
+
+  const pendientes = ventas.filter((v) => v.estado !== "APROBADO").length;
+
+  const CopyIcon = ({ copiado }) =>
+    copiado ? (
+      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12l5 5 9-10" strokeLinecap="round" strokeLinejoin="round" /></svg>
+    ) : (
+      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><rect x="8" y="8" width="12" height="12" rx="1.5" /><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3" /></svg>
+    );
 
   return (
-    <div>
-      <h2 className="mb-6 text-xl font-bold text-[#2d249c]">Cursos Vendidos</h2>
+    <div className="max-w-7xl">
+      <div className="mb-6">
+        <h2 className="page-title">Cursos vendidos</h2>
+        <p className="mt-1 text-sm text-muted">
+          <span className="font-mono tabular-nums text-ink">{ventas.length}</span> ventas ·{" "}
+          <span className="font-mono tabular-nums text-warn">{pendientes}</span> pendientes de aprobación
+        </p>
+      </div>
       {ventas.length === 0 ? (
-        <p className="text-gray-500">No hay ventas registradas.</p>
+        <div className="panel px-6 py-12 text-center">
+          <p className="font-medium text-ink">Todavía no hay ventas</p>
+          <p className="mt-1 text-sm text-muted">Las compras hechas desde la landing aparecen acá para aprobarlas.</p>
+        </div>
       ) : (
-        <div className="w-full bg-white rounded-xl shadow-lg mb-4 overflow-x-auto max-w-full">
-          <table className="w-full text-xs md:text-sm text-left">
+        <div className="panel overflow-x-auto">
+          <table className="data-table">
             <thead>
-              <tr className="bg-violet-100">
-                <th className="px-2 py-2 font-bold text-[#2d249c] whitespace-nowrap">ID</th>
-                <th className="px-2 py-2 font-bold text-[#2d249c] whitespace-nowrap">Fecha</th>
-                <th className="px-2 py-2 font-bold text-[#2d249c] whitespace-nowrap">Nombre</th>
-                <th className="px-2 py-2 font-bold text-[#2d249c] whitespace-nowrap">Mail</th>
-                <th className="px-2 py-2 font-bold text-[#2d249c] whitespace-nowrap">Contraseña</th>
-                <th className="px-2 py-2 font-bold text-[#2d249c] whitespace-nowrap">Curso</th>
-                <th className="px-2 py-2 font-bold text-[#2d249c] whitespace-nowrap">Precio</th>
-                <th className="px-2 py-2 font-bold text-[#2d249c] whitespace-nowrap">Método</th>
-                <th className="px-2 py-2 font-bold text-[#2d249c] whitespace-nowrap">TxID</th>
-                <th className="px-2 py-2 font-bold text-[#2d249c] whitespace-nowrap">Estado</th>
-                <th className="px-2 py-2 font-bold text-[#2d249c] whitespace-nowrap">Acción</th>
+              <tr>
+                <th>#</th>
+                <th>Fecha</th>
+                <th>Alumno</th>
+                <th>Curso</th>
+                <th className="text-right">Precio</th>
+                <th>Método</th>
+                <th>TxID</th>
+                <th>Estado</th>
+                <th className="text-right">Acción</th>
               </tr>
             </thead>
             <tbody>
-              {ventas.map((venta, idx) => (
-                <tr
-                  key={venta.id}
-                  className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                >
-                  {/* Columna ID: número + botón copiar */}
-                  <td className="px-2 py-2 text-gray-800 text-center whitespace-nowrap">
-                    <span className="flex items-center justify-center gap-2">
-                      <span>{idx + 1}</span>
-                      <button
-                        type="button"
-                        aria-label="Copiar ID Firebase"
-                        role="button"
-                        className={`ml-1 transition rounded-full px-1 py-0.5 ${
-                          copiedFirebaseId === venta.id
-                            ? "bg-green-200 text-green-700"
-                            : "hover:bg-violet-200 text-violet-700"
-                        }`}
-                        title={
-                          copiedFirebaseId === venta.id
-                            ? "¡Copiado!"
-                            : "Copiar ID Firebase"
-                        }
-                        onClick={() => handleCopyFirebaseId(venta.id)}
-                      >
-                        {copiedFirebaseId === venta.id ? "✓" : "📋"}
-                      </button>
-                    </span>
-                  </td>
-
-                  <td className="px-2 py-2 text-gray-800 text-center whitespace-nowrap">
-                    {venta.fecha && venta.fecha.toDate
-                      ? formatFecha(venta.fecha)
-                      : venta.fecha || (
-                          <span className="text-gray-400">Sin fecha</span>
-                        )}
-                  </td>
-                  <td className="px-2 py-2 text-gray-900 whitespace-normal break-words">
-                    {venta.nombre || (
-                      <span className="text-gray-400">Sin nombre</span>
-                    )}
-                  </td>
-                  <td className="px-2 py-2 text-gray-900 whitespace-normal break-words">
-                    {venta.email || (
-                      <span className="text-gray-400">Sin email</span>
-                    )}
-                  </td>
-                  <td className="px-2 py-2 text-gray-900 text-center whitespace-nowrap">
-                    {venta.password || <span className="text-gray-400">-</span>}
-                  </td>
-                  <td className="px-2 py-2 text-gray-900 whitespace-normal break-words">
-                    {venta.curso || (
-                      <span className="text-gray-400">Sin curso</span>
-                    )}
-                  </td>
-                  <td className="px-2 py-2 text-gray-900 text-center whitespace-nowrap">
-                    {venta.precio !== undefined ? (
-                      `$${venta.precio}`
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </td>
-                  <td className="px-2 py-2 text-gray-900 whitespace-normal break-words">
-                    {venta.metodo || <span className="text-gray-400">-</span>}
-                  </td>
-                  {/* TxID CHIP + COPY */}
-                  <td className="px-2 py-2 text-gray-900 text-xs whitespace-nowrap">
-                    {venta.txid ? (
-                      <span className="flex items-center gap-2">
-                        <span
-                          title={venta.txid}
-                          className="inline-block bg-violet-100 text-[#2d249c] px-2 py-0.5 rounded-full text-xs max-w-[100px] truncate"
-                        >
-                          {recortarHash(venta.txid)}
-                        </span>
+              {ventas.map((venta, idx) => {
+                const aprobado = venta.estado === "APROBADO";
+                return (
+                  <tr key={venta.id}>
+                    <td>
+                      <span className="flex items-center gap-1 font-mono tabular-nums text-muted">
+                        {idx + 1}
                         <button
                           type="button"
-                          aria-label="Copiar TxID"
-                          role="button"
-                          className={`ml-1 transition rounded-full px-1 py-0.5 ${
-                            copiedId === venta.id
-                              ? "bg-green-200 text-green-700"
-                              : "hover:bg-violet-200 text-violet-700"
-                          }`}
-                          title={
-                            copiedId === venta.id
-                              ? "¡Copiado!"
-                              : "Copiar TxID"
-                          }
-                          onClick={() => handleCopy(venta.id, venta.txid)}
+                          aria-label="Copiar ID de Firebase"
+                          title={copiedFirebaseId === venta.id ? "¡Copiado!" : "Copiar ID de Firebase"}
+                          className={`icon-btn ${copiedFirebaseId === venta.id ? "text-up" : ""}`}
+                          onClick={() => handleCopyFirebaseId(venta.id)}
                         >
-                          {copiedId === venta.id ? "✓" : "📋"}
+                          <CopyIcon copiado={copiedFirebaseId === venta.id} />
                         </button>
                       </span>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </td>
-                  <td
-                    className={`px-2 py-2 font-bold text-center text-[11px] md:text-xs whitespace-nowrap ${
-                      venta.estado === "APROBADO"
-                        ? "text-green-600"
-                        : "text-yellow-700"
-                    }`}
-                  >
-                    {venta.estado || "PENDIENTE"}
-                  </td>
-                  {/* Botón de acción con ✓ / ✗ */}
-                  <td className="px-2 py-2 text-center whitespace-nowrap">
-                    {venta.estado !== "APROBADO" ? (
-                      <button
-                        className="bg-[#2d249c] hover:bg-[#241d74] text-white px-3 py-1 rounded font-semibold text-xs md:text-sm transition disabled:opacity-60"
-                        disabled={!!cambiandoEstado}
-                        onClick={() => cambiarEstado(venta, "APROBADO")}
-                      >
-                        {cambiandoEstado === venta.id + "APROBADO" ? "..." : "✓"}
-                      </button>
-                    ) : (
-                      <button
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded font-semibold text-xs md:text-sm transition disabled:opacity-60"
-                        disabled={!!cambiandoEstado}
-                        onClick={() => cambiarEstado(venta, "PENDIENTE")}
-                      >
-                        {cambiandoEstado === venta.id + "PENDIENTE" ? "..." : "✗"}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="whitespace-nowrap font-mono tabular-nums text-muted">
+                      {venta.fecha && venta.fecha.toDate
+                        ? formatFecha(venta.fecha)
+                        : venta.fecha || <span className="text-faint">Sin fecha</span>}
+                    </td>
+                    <td>
+                      <div className="font-medium">{venta.nombre || <span className="text-faint">Sin nombre</span>}</div>
+                      <div className="text-muted">{venta.email || <span className="text-faint">Sin email</span>}</div>
+                    </td>
+                    <td>{venta.curso || <span className="text-faint">Sin curso</span>}</td>
+                    <td className="whitespace-nowrap text-right font-mono tabular-nums">
+                      {venta.precio !== undefined ? `$${venta.precio}` : <span className="text-faint">—</span>}
+                    </td>
+                    <td className="text-muted">{venta.metodo || <span className="text-faint">—</span>}</td>
+                    <td className="whitespace-nowrap">
+                      {venta.txid ? (
+                        <span className="flex items-center gap-1">
+                          <span title={venta.txid} className="chip font-mono">{recortarHash(venta.txid)}</span>
+                          <button
+                            type="button"
+                            aria-label="Copiar TxID"
+                            title={copiedId === venta.id ? "¡Copiado!" : "Copiar TxID"}
+                            className={`icon-btn ${copiedId === venta.id ? "text-up" : ""}`}
+                            onClick={() => handleCopy(venta.id, venta.txid)}
+                          >
+                            <CopyIcon copiado={copiedId === venta.id} />
+                          </button>
+                        </span>
+                      ) : (
+                        <span className="text-faint">—</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`inline-flex items-center gap-1.5 font-mono text-xs font-medium uppercase tracking-wider ${aprobado ? "text-up" : "text-warn"}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${aprobado ? "bg-up" : "bg-warn"}`} aria-hidden="true" />
+                        {aprobado ? "Aprobado" : "Pendiente"}
+                      </span>
+                    </td>
+                    <td className="text-right">
+                      {aprobado ? (
+                        <button
+                          className="btn-secondary btn-sm whitespace-nowrap"
+                          disabled={!!cambiandoEstado}
+                          onClick={() => cambiarEstado(venta, "PENDIENTE")}
+                        >
+                          {cambiandoEstado === venta.id + "PENDIENTE" ? "Guardando…" : "Revertir"}
+                        </button>
+                      ) : (
+                        <button
+                          className="btn-primary btn-sm whitespace-nowrap"
+                          disabled={!!cambiandoEstado}
+                          onClick={() => cambiarEstado(venta, "APROBADO")}
+                        >
+                          {cambiandoEstado === venta.id + "APROBADO" ? "Aprobando…" : "Aprobar"}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

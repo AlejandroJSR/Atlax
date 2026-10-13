@@ -95,6 +95,15 @@ iframe {
   .eyebrow {
     @apply font-mono text-xs uppercase tracking-[0.14em] text-accent-soft;
   }
+  .page-title {
+    @apply text-2xl font-semibold tracking-tight text-ink;
+  }
+  .chip {
+    @apply inline-flex items-center rounded-sm border border-line-strong bg-surface-2 px-2 py-0.5 text-xs font-medium text-ink;
+  }
+  .icon-btn {
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-surface-2 hover:text-ink;
+  }
   .data-table {
     @apply w-full text-left text-sm;
   }

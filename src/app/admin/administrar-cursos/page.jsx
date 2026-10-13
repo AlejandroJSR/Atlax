@@ -98,55 +98,60 @@ export default function AdministrarCursosPage() {
     setFormData({ ...formData, beneficios: nuevos });
   };
 
-  if (loading) return <p className="text-gray-900">Cargando cursos...</p>;
+
+  if (loading) return <p className="text-muted">Cargando cursos…</p>;
 
   return (
-    <div>
-      <h2 className="mb-6 text-xl font-bold text-[#2d249c]">Administrar Cursos</h2>
-      <button
-        className="mb-4 bg-[#2d249c] text-white px-4 py-2 rounded hover:bg-[#241d74]"
-        onClick={() => abrirModal()}
-      >
-        Crear Curso
-      </button>
+    <div className="max-w-5xl">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <h2 className="page-title">Administrar cursos</h2>
+        <button className="btn-primary btn-sm" onClick={() => abrirModal()}>
+          + Crear curso
+        </button>
+      </div>
 
       {cursos.length === 0 ? (
-        <p className="text-gray-900">No hay cursos registrados.</p>
+        <div className="panel px-6 py-12 text-center">
+          <p className="font-medium text-ink">Todavía no hay cursos</p>
+          <p className="mt-1 text-sm text-muted">Creá el primero para que aparezca en la landing.</p>
+        </div>
       ) : (
-        <div className="w-full bg-white rounded-xl shadow-lg mb-4 overflow-x-auto max-w-full">
-          <table className="w-full text-xs md:text-sm text-left">
+        <div className="panel overflow-x-auto">
+          <table className="data-table">
             <thead>
-              <tr className="bg-violet-100 text-gray-900">
-                <th className="px-2 py-2 font-bold">Nombre</th>
-                <th className="px-2 py-2 font-bold">Precio</th>
-                <th className="px-2 py-2 font-bold">Activo</th>
-                <th className="px-2 py-2 font-bold">Acciones</th>
+              <tr>
+                <th>Nombre</th>
+                <th className="text-right">Precio</th>
+                <th>Estado</th>
+                <th className="text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {cursos.map((curso) => (
-                <tr key={curso.id} className="border-b hover:bg-gray-50">
-                  <td className="px-2 py-2 text-gray-900">{curso.nombre}</td>
-                  <td className="px-2 py-2 text-gray-900">${curso.precio}</td>
-                  <td className="px-2 py-2 text-gray-900">{curso.activo ? "Sí" : "No"}</td>
-                  <td className="px-2 py-2 flex gap-2 flex-wrap">
-                    <button
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                      onClick={() => abrirModal(curso)}
-                    >
-                      Editar
-                    </button>
-                    <Link href={`/admin/administrar-cursos/modulos/${curso.id}`}>
-                      <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded">
-                        Módulos
+                <tr key={curso.id}>
+                  <td className="font-medium">
+                    {curso.nombre}
+                    {curso.destacado && <span className="chip ml-2 border-accent/50 text-accent-soft">Destacado</span>}
+                  </td>
+                  <td className="text-right font-mono tabular-nums">${curso.precio}</td>
+                  <td>
+                    <span className={`inline-flex items-center gap-1.5 text-sm ${curso.activo ? "text-up" : "text-faint"}`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${curso.activo ? "bg-up" : "bg-faint"}`} aria-hidden="true" />
+                      {curso.activo ? "Publicado" : "Oculto"}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="flex justify-end gap-2">
+                      <button className="btn-secondary btn-sm" onClick={() => abrirModal(curso)}>
+                        Editar
                       </button>
-                    </Link>
-                    <button
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                      onClick={() => eliminarCurso(curso.id)}
-                    >
-                      Eliminar
-                    </button>
+                      <Link href={`/admin/administrar-cursos/modulos/${curso.id}`} className="btn-secondary btn-sm">
+                        Módulos
+                      </Link>
+                      <button className="btn-danger" onClick={() => eliminarCurso(curso.id)}>
+                        Eliminar
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -156,107 +161,113 @@ export default function AdministrarCursosPage() {
       )}
 
       {modalOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-lg text-gray-900">
-            <h3 className="text-lg font-bold mb-4">
-              {cursoActual ? "Editar Curso" : "Crear Curso"}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <div role="dialog" aria-modal="true" aria-labelledby="curso-modal-titulo" className="panel animate-fadein flex max-h-[95vh] w-full max-w-lg flex-col shadow-2xl">
+            <h3 id="curso-modal-titulo" className="border-b border-line px-6 py-5 text-xl font-semibold text-ink">
+              {cursoActual ? "Editar curso" : "Crear curso"}
             </h3>
-            <label className="block mb-2">
-              Nombre:
-              <input
-                type="text"
-                className="w-full border rounded p-2 text-gray-900"
-                value={formData.nombre}
-                onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-              />
-            </label>
-            <label className="block mb-2">
-              Descripción:
-              <textarea
-                className="w-full border rounded p-2 text-gray-900"
-                value={formData.descripcion}
-                onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-              />
-            </label>
-            <label className="block mb-2">
-              Nivel:
-              <input
-                type="text"
-                className="w-full border rounded p-2 text-gray-900"
-                value={formData.nivel}
-                onChange={(e) => setFormData({ ...formData, nivel: e.target.value })}
-              />
-            </label>
-            <label className="block mb-2">
-              Precio:
-              <input
-                type="number"
-                className="w-full border rounded p-2 text-gray-900"
-                value={formData.precio}
-                onChange={(e) => setFormData({ ...formData, precio: parseFloat(e.target.value) })}
-              />
-            </label>
-            <div className="flex gap-2 mb-2">
-              <label className="flex items-center gap-2">
+            <div className="space-y-4 overflow-y-auto px-6 py-5">
+              <div>
+                <label className="field-label" htmlFor="curso-nombre">Nombre</label>
                 <input
-                  type="checkbox"
-                  checked={formData.destacado}
-                  onChange={(e) => setFormData({ ...formData, destacado: e.target.checked })}
+                  id="curso-nombre"
+                  type="text"
+                  className="field"
+                  value={formData.nombre}
+                  onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                 />
-                Destacado
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.activo}
-                  onChange={(e) => setFormData({ ...formData, activo: e.target.checked })}
+              </div>
+              <div>
+                <label className="field-label" htmlFor="curso-descripcion">Descripción</label>
+                <textarea
+                  id="curso-descripcion"
+                  rows={3}
+                  className="field resize-y"
+                  value={formData.descripcion}
+                  onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
                 />
-                Activo
-              </label>
-            </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="field-label" htmlFor="curso-nivel">Nivel</label>
+                  <input
+                    id="curso-nivel"
+                    type="text"
+                    className="field"
+                    value={formData.nivel}
+                    onChange={(e) => setFormData({ ...formData, nivel: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="curso-precio">Precio (USD)</label>
+                  <input
+                    id="curso-precio"
+                    type="number"
+                    className="field font-mono tabular-nums"
+                    value={formData.precio}
+                    onChange={(e) => setFormData({ ...formData, precio: parseFloat(e.target.value) })}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-6">
+                <label className="flex items-center gap-2 text-ink">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 accent-[var(--accent)]"
+                    checked={formData.destacado}
+                    onChange={(e) => setFormData({ ...formData, destacado: e.target.checked })}
+                  />
+                  Destacado
+                </label>
+                <label className="flex items-center gap-2 text-ink">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 accent-[var(--accent)]"
+                    checked={formData.activo}
+                    onChange={(e) => setFormData({ ...formData, activo: e.target.checked })}
+                  />
+                  Publicado en la landing
+                </label>
+              </div>
 
-            <h4 className="font-bold mb-2">Beneficios:</h4>
-            <ul className="mb-2">
-              {formData.beneficios.map((b, index) => (
-                <li key={index} className="flex justify-between items-center">
-                  <span>{b}</span>
-                  <button
-                    className="text-red-500 text-sm"
-                    onClick={() => eliminarBeneficio(index)}
-                  >
-                    Quitar
+              <div>
+                <span className="field-label">Beneficios</span>
+                {formData.beneficios.length > 0 && (
+                  <ul className="mb-3 divide-y divide-line rounded-md border border-line">
+                    {formData.beneficios.map((b, index) => (
+                      <li key={index} className="flex items-center justify-between gap-3 px-3 py-2 text-sm text-ink">
+                        <span>{b}</span>
+                        <button className="text-sm text-down hover:underline" onClick={() => eliminarBeneficio(index)}>
+                          Quitar
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="flex gap-2">
+                  <label htmlFor="curso-beneficio" className="sr-only">Nuevo beneficio</label>
+                  <input
+                    id="curso-beneficio"
+                    type="text"
+                    className="field flex-1"
+                    value={nuevoBeneficio}
+                    onChange={(e) => setNuevoBeneficio(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); agregarBeneficio(); } }}
+                    placeholder="Ej.: Acceso vitalicio"
+                  />
+                  <button className="btn-secondary btn-sm" onClick={agregarBeneficio}>
+                    Agregar
                   </button>
-                </li>
-              ))}
-            </ul>
-            <div className="flex gap-2 mb-4">
-              <input
-                type="text"
-                className="border rounded p-2 flex-1"
-                value={nuevoBeneficio}
-                onChange={(e) => setNuevoBeneficio(e.target.value)}
-                placeholder="Agregar beneficio"
-              />
-              <button
-                className="bg-green-500 text-white px-4 py-2 rounded"
-                onClick={agregarBeneficio}
-              >
-                +
-              </button>
+                </div>
+              </div>
             </div>
 
-            <div className="flex justify-end mt-4">
-              <button
-                className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded mr-2"
-                onClick={() => setModalOpen(false)}
-              >
+            <div className="flex justify-end gap-2 border-t border-line px-6 py-4">
+              <button className="btn-secondary btn-sm" onClick={() => setModalOpen(false)}>
                 Cancelar
               </button>
-              <button
-                className="bg-[#2d249c] hover:bg-[#241d74] text-white px-4 py-2 rounded"
-                onClick={guardarCurso}
-              >
-                Guardar
+              <button className="btn-primary btn-sm" onClick={guardarCurso}>
+                Guardar curso
               </button>
             </div>
           </div>

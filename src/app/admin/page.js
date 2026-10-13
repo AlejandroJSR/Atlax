@@ -1,10 +1,26 @@
+import Link from "next/link";
+
+const secciones = [
+  { href: "/admin/cursos-vendidos", titulo: "Cursos vendidos", texto: "Aprobá compras pendientes y revisá los TXID." },
+  { href: "/admin/administrar-cursos", titulo: "Administrar cursos", texto: "Precios, beneficios, módulos y clases." },
+  { href: "/admin/usuarios", titulo: "Usuarios", texto: "Creá cuentas y asigná cursos a cada alumno." },
+];
+
 export default function AdminHome() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-2 text-indigo-900">Panel de Administración</h1>
-      <p className="text-gray-700 mb-4">
-        Selecciona una sección del menú para comenzar a gestionar la academia.
-      </p>
+    <div className="max-w-4xl">
+      <h1 className="page-title mb-2">Panel de administración</h1>
+      <p className="mb-8 text-muted">Elegí una sección para empezar.</p>
+      <div className="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-3">
+        {secciones.map((s) => (
+          <Link key={s.href} href={s.href} className="group bg-surface p-5 transition-colors hover:bg-surface-2">
+            <h2 className="mb-1 font-semibold text-ink">
+              {s.titulo} <span className="text-faint transition-colors group-hover:text-accent-soft" aria-hidden="true">→</span>
+            </h2>
+            <p className="text-sm text-muted">{s.texto}</p>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
