@@ -54,8 +54,10 @@ export default function CalculadoraPage() {
   }, []);
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", paddingTop: "40px", minHeight: "100vh" }}>
-      <div style={{ width: `${width}px`, transform: `scale(${scale})`, transformOrigin: "top center" }}>
+    <div className="max-w-6xl">
+      <h1 className="page-title mb-1">Calculadora de riesgo</h1>
+      <p className="mb-6 text-muted">Calculá el tamaño de posición según tu stop loss y el % de la cuenta que arriesgás.</p>
+      <div style={{ width: `${width}px`, transform: `scale(${scale})`, transformOrigin: "top left" }}>
         <div id="position-size-calculator-993519"></div>
       </div>
     </div>

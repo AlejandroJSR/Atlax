@@ -46,7 +46,7 @@ function transformarContenidoHTML(html) {
 
 const ContenidoClase = React.memo(({ html }) => (
   <div
-    className="leading-relaxed text-gray-900"
+    className="prose-clase"
     dangerouslySetInnerHTML={{ __html: html }}
   />
 ));
@@ -179,67 +179,95 @@ function AlumnosPage() {
     setContenidoClase(transformarContenidoHTML(html));
   }, [cursoActivo?.id, moduloActivo, claseActiva]);
 
-  const BotonVolver = ({ onClick, texto }) => (
-    <button
-      onClick={onClick}
-      className="mb-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-    >
-      ← {texto}
-    </button>
+
+  // Migas de pan: reemplazan los botones "Volver" y muestran dónde está el alumno.
+  const Migas = () => {
+    const pasos = [{ label: "Mis cursos", vista: "cursos" }];
+    if (cursoActivo && vista !== "cursos") pasos.push({ label: cursoActivo.nombre, vista: "modulos" });
+    if (moduloActivo != null && (vista === "clases" || vista === "clase"))
+      pasos.push({ label: `Módulo ${moduloActivo + 1}`, vista: "clases" });
+    if (vista === "clase" && claseActiva != null)
+      pasos.push({
+        label: cursoActivo.modulos[moduloActivo].clases[claseActiva]?.titulo || `Clase ${claseActiva + 1}`,
+        vista: "clase",
+      });
+    return (
+      <nav aria-label="Ubicación" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm">
+        {pasos.map((p, i) => {
+          const ultimo = i === pasos.length - 1;
+          return (
+            <span key={p.vista} className="flex items-center gap-1.5">
+              {ultimo ? (
+                <span aria-current="page" className="text-ink">{p.label}</span>
+              ) : (
+                <button onClick={() => setVista(p.vista)} className="text-muted underline-offset-4 hover:text-ink hover:underline">
+                  {p.label}
+                </button>
+              )}
+              {!ultimo && <span className="text-faint" aria-hidden="true">/</span>}
+            </span>
+          );
+        })}
+      </nav>
+    );
+  };
+
+  const Flecha = () => (
+    <span className="text-faint transition-colors group-hover:text-accent-soft" aria-hidden="true">→</span>
   );
 
   if (!user) return null;
 
-  return (
-    <main className="p-4 md:p-8 text-gray-900">
-      {vista === "cursos" && (
-        <h1 className="text-3xl font-bold text-indigo-900 mb-6">
-          ¡Hola, <span>Trader</span>!
-        </h1>
-      )}
+  const clasesModulo = cursoActivo?.modulos?.[moduloActivo]?.clases || [];
+  const esPrimera = claseActiva === 0;
+  const esUltima = claseActiva === clasesModulo.length - 1;
 
+  return (
+    <div className="max-w-5xl">
       {/* ---- Vista Cursos ---- */}
       {vista === "cursos" && (
         <section>
+          <h1 className="page-title mb-1">Hola, trader</h1>
+          <p className="mb-8 text-muted">Retomá donde lo dejaste.</p>
           {loadingCursos || loading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((n) => (
-                <div
-                  key={n}
-                  className="p-6 border rounded-lg shadow bg-gray-100 animate-pulse"
-                >
-                  <div className="h-6 bg-gray-300 rounded w-2/3 mb-4"></div>
-                  <div className="h-4 bg-gray-300 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-                  <div className="mt-4 h-8 bg-gray-300 rounded w-24"></div>
+            <div className="grid gap-4 md:grid-cols-2" aria-busy="true" aria-label="Cargando cursos">
+              {[1, 2].map((n) => (
+                <div key={n} className="panel animate-pulse p-6">
+                  <div className="mb-3 h-5 w-2/3 rounded bg-surface-2" />
+                  <div className="mb-2 h-4 rounded bg-surface-2" />
+                  <div className="h-4 w-1/2 rounded bg-surface-2" />
                 </div>
               ))}
             </div>
           ) : cursos.length === 0 ? (
-            <div className="col-span-full text-gray-500">
-              No tenés cursos aprobados todavía.
+            <div className="panel px-6 py-12 text-center">
+              <p className="font-medium text-ink">Todavía no tenés cursos aprobados</p>
+              <p className="mx-auto mt-1 max-w-sm text-sm text-muted">
+                Si ya pagaste, tu compra está en revisión. Te avisamos apenas se apruebe.
+              </p>
+              <a href="/#cursos" className="btn-secondary btn-sm mt-5">Ver cursos disponibles</a>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid gap-4 md:grid-cols-2">
               {cursos.map((curso, idx) => (
-                <div
+                <button
                   key={idx}
-                  className="p-6 border rounded-lg shadow hover:shadow-lg transition bg-white cursor-pointer"
+                  type="button"
+                  className="panel group flex flex-col p-6 text-left transition-colors hover:border-line-strong hover:bg-surface-2"
                   onClick={() => {
                     setCursoActivo(curso);
                     setVista("modulos");
                   }}
                 >
-                  <h3 className="font-bold text-lg mb-2 text-indigo-700">
-                    {curso.nombre}
-                  </h3>
-                  <p className="text-sm text-gray-700 mb-2">
-                    {curso.descripcion || ""}
-                  </p>
-                  <span className="inline-block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
-                    Entrar
+                  <span className="mb-3 font-mono text-xs uppercase tracking-wider text-faint">
+                    {(curso.modulos || []).length} módulos
                   </span>
-                </div>
+                  <span className="mb-2 text-lg font-semibold text-ink">{curso.nombre}</span>
+                  <span className="mb-5 text-sm leading-relaxed text-muted">{curso.descripcion || ""}</span>
+                  <span className="mt-auto inline-flex items-center gap-2 text-sm font-medium text-accent-soft">
+                    Entrar al curso <span aria-hidden="true">→</span>
+                  </span>
+                </button>
               ))}
             </div>
           )}
@@ -249,123 +277,120 @@ function AlumnosPage() {
       {/* ---- Vista Modulos ---- */}
       {vista === "modulos" && cursoActivo && (
         <section>
-          <BotonVolver texto="Volver a cursos" onClick={() => setVista("cursos")} />
-          <h2 className="text-2xl font-semibold mb-6 text-indigo-800">
-            {cursoActivo.nombre} - Módulos
-          </h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            {(cursoActivo.modulos || []).map((modulo, idx) => (
-              <div
-                key={idx}
-                className="p-4 bg-white border rounded-lg shadow hover:shadow-lg transition cursor-pointer"
-                onClick={() => {
-                  setModuloActivo(idx);
-                  setVista("clases");
-                }}
-              >
-                <h3 className="font-bold text-lg text-indigo-700 mb-2">
-                  {`Módulo ${idx + 1}: ${modulo.nombre}`}
-                </h3>
-                <p className="text-gray-600">{modulo.descripcion || ""}</p>
-              </div>
-            ))}
-          </div>
+          <Migas />
+          <h2 className="page-title mb-6">{cursoActivo.nombre}</h2>
+          {(cursoActivo.modulos || []).length === 0 ? (
+            <p className="text-muted">Este curso todavía no tiene módulos publicados.</p>
+          ) : (
+            <ol className="panel divide-y divide-line overflow-hidden">
+              {(cursoActivo.modulos || []).map((modulo, idx) => (
+                <li key={idx}>
+                  <button
+                    type="button"
+                    className="group flex w-full items-start gap-5 p-5 text-left transition-colors hover:bg-surface-2"
+                    onClick={() => {
+                      setModuloActivo(idx);
+                      setVista("clases");
+                    }}
+                  >
+                    <span className="pt-0.5 font-mono text-sm tabular-nums text-accent-soft">{String(idx + 1).padStart(2, "0")}</span>
+                    <span className="flex-1">
+                      <span className="block font-semibold text-ink">{modulo.nombre}</span>
+                      {modulo.descripcion && <span className="mt-1 block text-sm text-muted">{modulo.descripcion}</span>}
+                      <span className="mt-2 block font-mono text-xs text-faint">{(modulo.clases || []).length} clases</span>
+                    </span>
+                    <Flecha />
+                  </button>
+                </li>
+              ))}
+            </ol>
+          )}
         </section>
       )}
 
       {/* ---- Vista Clases ---- */}
       {vista === "clases" && cursoActivo && moduloActivo != null && (
         <section>
-          <BotonVolver texto="Volver a módulos" onClick={() => setVista("modulos")} />
-          <h2 className="text-2xl font-semibold mb-6 text-indigo-800">
-            {cursoActivo.modulos[moduloActivo].nombre} - Clases
-          </h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            {(cursoActivo.modulos[moduloActivo].clases || []).map((clase, idx) => (
-              <div
-                key={idx}
-                className="p-4 bg-white border rounded-lg shadow hover:shadow-lg transition cursor-pointer"
-                onClick={() => {
-                  setClaseActiva(idx);
-                  setVista("clase");
-                }}
-              >
-                <h4 className="font-bold text-indigo-700">
-                  {clase.titulo || `Clase ${idx + 1}`}
-                </h4>
-              </div>
-            ))}
-          </div>
+          <Migas />
+          <p className="eyebrow mb-2">Módulo {moduloActivo + 1}</p>
+          <h2 className="page-title mb-6">{cursoActivo.modulos[moduloActivo].nombre}</h2>
+          {clasesModulo.length === 0 ? (
+            <p className="text-muted">Este módulo todavía no tiene clases.</p>
+          ) : (
+            <ol className="panel divide-y divide-line overflow-hidden">
+              {clasesModulo.map((clase, idx) => (
+                <li key={idx}>
+                  <button
+                    type="button"
+                    className="group flex w-full items-center gap-5 px-5 py-4 text-left transition-colors hover:bg-surface-2"
+                    onClick={() => {
+                      setClaseActiva(idx);
+                      setVista("clase");
+                    }}
+                  >
+                    <span className="font-mono text-sm tabular-nums text-faint">{String(idx + 1).padStart(2, "0")}</span>
+                    <span className="flex-1 font-medium text-ink">{clase.titulo || `Clase ${idx + 1}`}</span>
+                    <Flecha />
+                  </button>
+                </li>
+              ))}
+            </ol>
+          )}
         </section>
       )}
 
       {/* ---- Vista Clase Individual ---- */}
       {vista === "clase" && cursoActivo && moduloActivo != null && claseActiva != null && (
-        <section className="max-w-5xl mx-auto space-y-8">
-          <BotonVolver texto="Volver a clases" onClick={() => setVista("clases")} />
+        <section className="space-y-6">
+          <Migas />
+          <h2 className="page-title">
+            {clasesModulo[claseActiva]?.titulo || `Clase ${claseActiva + 1}`}
+          </h2>
 
           {/* Contenido de la clase */}
-          <div className="bg-white rounded shadow p-6">
+          <article className="panel p-6 md:p-8">
             <ContenidoClase html={contenidoClase} />
-          </div>
+          </article>
 
-          {/* Botones de navegación de clases */}
-          <div className="flex justify-between items-center mt-4">
+          {/* Navegación entre clases */}
+          <div className="flex items-center justify-between gap-3">
             <button
-              disabled={claseActiva === 0}
+              disabled={esPrimera}
               onClick={() => setClaseActiva((prev) => prev - 1)}
-              className={`px-4 py-2 rounded transition ${
-                claseActiva === 0
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-indigo-600 text-white hover:bg-indigo-700"
-              }`}
+              className="btn-secondary btn-sm"
             >
               ← Clase anterior
             </button>
+            <span className="font-mono text-xs tabular-nums text-faint">
+              {claseActiva + 1} / {clasesModulo.length}
+            </span>
             <button
-              disabled={
-                claseActiva === cursoActivo.modulos[moduloActivo].clases.length - 1
-              }
+              disabled={esUltima}
               onClick={() => setClaseActiva((prev) => prev + 1)}
-              className={`px-4 py-2 rounded transition ${
-                claseActiva ===
-                cursoActivo.modulos[moduloActivo].clases.length - 1
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-indigo-600 text-white hover:bg-indigo-700"
-              }`}
+              className="btn-primary btn-sm"
             >
               Siguiente clase →
             </button>
           </div>
 
           {/* Notas personales */}
-          <div className="bg-white border rounded shadow p-6 space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="font-bold text-lg text-indigo-700">Notas personales</h3>
+          <div className="panel space-y-4 p-6">
+            <div className="flex items-center justify-between gap-4">
+              <h3 className="font-semibold text-ink">Mis notas</h3>
               {!editNota && (
-                <div className="flex gap-4">
+                <div className="flex gap-2">
                   {nota ? (
                     <>
+                      <button className="btn-secondary btn-sm" onClick={() => setEditNota(true)}>Editar</button>
                       <button
-                        className="px-4 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                        onClick={() => setEditNota(true)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="px-4 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
-                        onClick={borrarNota}
+                        className="btn-danger"
+                        onClick={() => { if (confirm("¿Eliminar esta nota?")) borrarNota(); }}
                       >
                         Eliminar
                       </button>
                     </>
                   ) : (
-                    <button
-                      className="px-4 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition"
-                      onClick={() => setEditNota(true)}
-                    >
-                      Agregar nota
-                    </button>
+                    <button className="btn-secondary btn-sm" onClick={() => setEditNota(true)}>+ Agregar nota</button>
                   )}
                 </div>
               )}
@@ -373,36 +398,32 @@ function AlumnosPage() {
 
             {editNota ? (
               <div className="space-y-3">
+                <label htmlFor="nota-clase" className="sr-only">Nota de la clase</label>
                 <textarea
+                  id="nota-clase"
                   value={nota}
                   onChange={(e) => setNota(e.target.value)}
-                  className="w-full h-32 border rounded p-2 focus:ring focus:ring-indigo-300"
+                  rows={5}
+                  className="field resize-y"
+                  placeholder="Ideas clave, dudas, setups para practicar…"
                 />
-                <div className="flex justify-end gap-3">
-                  <button
-                    onClick={guardarNota}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-                  >
-                    Guardar
-                  </button>
-                  <button
-                    onClick={() => setEditNota(false)}
-                    className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
-                  >
-                    Cancelar
-                  </button>
+                <div className="flex justify-end gap-2">
+                  <button onClick={() => setEditNota(false)} className="btn-secondary btn-sm">Cancelar</button>
+                  <button onClick={guardarNota} className="btn-primary btn-sm">Guardar nota</button>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-700 whitespace-pre-line">
-                {nota || "Sin notas aún."}
+              <p className={`whitespace-pre-line ${nota ? "text-ink" : "text-faint"}`}>
+                {nota || "Todavía no escribiste notas para esta clase."}
               </p>
             )}
-            {mensajeNota && <p className="text-green-600 text-sm">{mensajeNota}</p>}
+            {mensajeNota && (
+              <p role="status" className="text-sm text-up">{mensajeNota}</p>
+            )}
           </div>
         </section>
       )}
-    </main>
+    </div>
   );
 }
 
