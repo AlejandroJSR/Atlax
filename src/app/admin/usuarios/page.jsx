@@ -93,7 +93,7 @@ export default function UsuariosPage() {
       setCursoEditando(null);
       setCursosSeleccionados([]);
     } catch (error) {
-      alert("Error actualizando cursos: " + error.message);
+      alert("Error actualizando planes: " + error.message);
     }
   };
 
@@ -224,7 +224,7 @@ export default function UsuariosPage() {
               <th className="w-20">#</th>
               <th>Nombre</th>
               <th>Email</th>
-              <th>Cursos asignados</th>
+              <th>Planes asignados</th>
               <th className="text-right">Acciones</th>
             </tr>
           </thead>
@@ -283,7 +283,7 @@ export default function UsuariosPage() {
                       ))}
                     </span>
                   ) : (
-                    <span className="text-faint">Sin cursos</span>
+                    <span className="text-faint">Sin planes</span>
                   )}
                 </td>
                 <td>
@@ -298,7 +298,7 @@ export default function UsuariosPage() {
                       ) : (
                         <>
                           <button onClick={() => setCursoEditando(null)} className="btn-secondary btn-sm">Cancelar</button>
-                          <button onClick={() => handleGuardarCurso(usuario.id)} className="btn-primary btn-sm">Guardar cursos</button>
+                          <button onClick={() => handleGuardarCurso(usuario.id)} className="btn-primary btn-sm">Guardar planes</button>
                         </>
                       )
                     ) : (
@@ -388,10 +388,10 @@ export default function UsuariosPage() {
 
               {nuevoUsuario.rol === "alumno" && (
                 <fieldset>
-                  <legend className="field-label">Asignar cursos</legend>
+                  <legend className="field-label">Asignar planes</legend>
                   <div className="flex flex-col gap-2">
                     {cursosDisponibles.length === 0 ? (
-                      <p className="text-sm text-faint">No hay cursos disponibles.</p>
+                      <p className="text-sm text-faint">No hay planes disponibles.</p>
                     ) : (
                       cursosDisponibles.map((curso) => (
                         <label key={curso.id} className="flex items-center gap-2 text-ink">

@@ -197,7 +197,7 @@ export default function Home() {
           .filter((curso) => curso.activo);
         setCursos(data);
       } catch (error) {
-        console.error("Error al obtener cursos:", error);
+        console.error("Error al obtener planes:", error);
       } finally {
         setLoadingCursos(false);
       }

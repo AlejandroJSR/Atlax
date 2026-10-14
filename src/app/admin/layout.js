@@ -7,8 +7,8 @@ import { auth } from "@/services/firebase";
 import AppSidebar from "@/components/AppSidebar";
 
 const menuItems = [
-  { icon: "receipt", label: "Cursos vendidos", href: "/admin/cursos-vendidos" },
-  { icon: "book", label: "Administrar cursos", href: "/admin/administrar-cursos" },
+  { icon: "receipt", label: "Ventas", href: "/admin/ventas" },
+  { icon: "book", label: "Administrar planes", href: "/admin/planes" },
   { icon: "users", label: "Usuarios", href: "/admin/usuarios" },
 ];
 

@@ -76,7 +76,7 @@ export default function AdministrarCursosPage() {
   };
 
   const eliminarCurso = async (cursoId) => {
-    if (confirm("¿Estás seguro de eliminar este curso? Esta acción no se puede deshacer.")) {
+    if (confirm("¿Estás seguro de eliminar este plan? Esta acción no se puede deshacer.")) {
       await deleteDoc(doc(db, "cursos", cursoId));
       cargarCursos();
     }
@@ -99,20 +99,20 @@ export default function AdministrarCursosPage() {
   };
 
 
-  if (loading) return <p className="text-muted">Cargando cursos…</p>;
+  if (loading) return <p className="text-muted">Cargando planes…</p>;
 
   return (
     <div className="max-w-5xl">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h2 className="page-title">Administrar cursos</h2>
+        <h2 className="page-title">Administrar planes</h2>
         <button className="btn-primary btn-sm" onClick={() => abrirModal()}>
-          + Crear curso
+          + Crear plan
         </button>
       </div>
 
       {cursos.length === 0 ? (
         <div className="panel px-6 py-12 text-center">
-          <p className="font-medium text-ink">Todavía no hay cursos</p>
+          <p className="font-medium text-ink">Todavía no hay planes</p>
           <p className="mt-1 text-sm text-muted">Creá el primero para que aparezca en la landing.</p>
         </div>
       ) : (
@@ -145,7 +145,7 @@ export default function AdministrarCursosPage() {
                       <button className="btn-secondary btn-sm" onClick={() => abrirModal(curso)}>
                         Editar
                       </button>
-                      <Link href={`/admin/administrar-cursos/modulos/${curso.id}`} className="btn-secondary btn-sm">
+                      <Link href={`/admin/planes/modulos/${curso.id}`} className="btn-secondary btn-sm">
                         Módulos
                       </Link>
                       <button className="btn-danger" onClick={() => eliminarCurso(curso.id)}>
@@ -164,7 +164,7 @@ export default function AdministrarCursosPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
           <div role="dialog" aria-modal="true" aria-labelledby="curso-modal-titulo" className="panel animate-fadein flex max-h-[95vh] w-full max-w-lg flex-col shadow-2xl">
             <h3 id="curso-modal-titulo" className="border-b border-line px-6 py-5 text-xl font-semibold text-ink">
-              {cursoActual ? "Editar curso" : "Crear curso"}
+              {cursoActual ? "Editar plan" : "Crear plan"}
             </h3>
             <div className="space-y-4 overflow-y-auto px-6 py-5">
               <div>
@@ -267,7 +267,7 @@ export default function AdministrarCursosPage() {
                 Cancelar
               </button>
               <button className="btn-primary btn-sm" onClick={guardarCurso}>
-                Guardar curso
+                Guardar plan
               </button>
             </div>
           </div>

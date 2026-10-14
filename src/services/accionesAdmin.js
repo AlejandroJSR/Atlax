@@ -12,7 +12,7 @@ export const cambiarEstadoCompra = async (compra, nuevoEstado) => {
   const querySnap = await getDocs(q);
 
   if (querySnap.empty) {
-    console.error("Curso no encontrado en la colección cursos");
+    console.error("Plan no encontrado en la colección cursos");
     return;
   }
 

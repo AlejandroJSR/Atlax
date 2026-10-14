@@ -81,7 +81,7 @@ export default function CursosVendidosPage() {
   return (
     <div className="max-w-7xl">
       <div className="mb-6">
-        <h2 className="page-title">Cursos vendidos</h2>
+        <h2 className="page-title">Ventas</h2>
         <p className="mt-1 text-sm text-muted">
           <span className="font-mono tabular-nums text-ink">{ventas.length}</span> ventas ·{" "}
           <span className="font-mono tabular-nums text-warn">{pendientes}</span> pendientes de aprobación
@@ -100,7 +100,7 @@ export default function CursosVendidosPage() {
                 <th>#</th>
                 <th>Fecha</th>
                 <th>Alumno</th>
-                <th>Curso</th>
+                <th>Plan</th>
                 <th className="text-right">Precio</th>
                 <th>Método</th>
                 <th>TxID</th>
@@ -136,7 +136,7 @@ export default function CursosVendidosPage() {
                       <div className="font-medium">{venta.nombre || <span className="text-faint">Sin nombre</span>}</div>
                       <div className="text-muted">{venta.email || <span className="text-faint">Sin email</span>}</div>
                     </td>
-                    <td>{venta.curso || <span className="text-faint">Sin curso</span>}</td>
+                    <td>{venta.curso || <span className="text-faint">Sin plan</span>}</td>
                     <td className="whitespace-nowrap text-right font-mono tabular-nums">
                       {venta.precio !== undefined ? `$${venta.precio}` : <span className="text-faint">—</span>}
                     </td>

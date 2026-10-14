@@ -106,12 +106,12 @@ export default function ClasesPage() {
   return (
     <div className="max-w-5xl">
       <nav aria-label="Ubicación" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm">
-        <Link href="/admin/administrar-cursos" className="text-muted underline-offset-4 hover:text-ink hover:underline">
-          Administrar cursos
+        <Link href="/admin/planes" className="text-muted underline-offset-4 hover:text-ink hover:underline">
+          Administrar planes
         </Link>
         <span className="text-faint" aria-hidden="true">/</span>
-        <Link href={`/admin/administrar-cursos/modulos/${cursoId}`} className="text-muted underline-offset-4 hover:text-ink hover:underline">
-          {curso?.nombre || "Curso"}
+        <Link href={`/admin/planes/modulos/${cursoId}`} className="text-muted underline-offset-4 hover:text-ink hover:underline">
+          {curso?.nombre || "Plan"}
         </Link>
         <span className="text-faint" aria-hidden="true">/</span>
         <span aria-current="page" className="text-ink">{modulo?.nombre || "Módulo"}</span>

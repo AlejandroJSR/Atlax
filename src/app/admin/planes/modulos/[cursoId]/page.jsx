@@ -70,11 +70,11 @@ export default function ModulosPage() {
   return (
     <div className="max-w-5xl">
       <nav aria-label="Ubicación" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm">
-        <Link href="/admin/administrar-cursos" className="text-muted underline-offset-4 hover:text-ink hover:underline">
-          Administrar cursos
+        <Link href="/admin/planes" className="text-muted underline-offset-4 hover:text-ink hover:underline">
+          Administrar planes
         </Link>
         <span className="text-faint" aria-hidden="true">/</span>
-        <span aria-current="page" className="text-ink">{curso?.nombre || "Curso"}</span>
+        <span aria-current="page" className="text-ink">{curso?.nombre || "Plan"}</span>
       </nav>
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -89,7 +89,7 @@ export default function ModulosPage() {
 
       {modulos.length === 0 ? (
         <div className="panel px-6 py-12 text-center">
-          <p className="font-medium text-ink">Este curso todavía no tiene módulos</p>
+          <p className="font-medium text-ink">Este plan todavía no tiene módulos</p>
           <p className="mt-1 text-sm text-muted">Creá el primero y después agregale clases.</p>
         </div>
       ) : (
@@ -117,7 +117,7 @@ export default function ModulosPage() {
                         Editar
                       </button>
                       <Link
-                        href={`/admin/administrar-cursos/modulos/${cursoId}/clases/${modulo.id}`}
+                        href={`/admin/planes/modulos/${cursoId}/clases/${modulo.id}`}
                         className="btn-secondary btn-sm"
                       >
                         Clases

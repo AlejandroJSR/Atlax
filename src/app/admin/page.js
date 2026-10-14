@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 const secciones = [
-  { href: "/admin/cursos-vendidos", titulo: "Cursos vendidos", texto: "Aprobá compras pendientes y revisá los TXID." },
-  { href: "/admin/administrar-cursos", titulo: "Administrar cursos", texto: "Precios, beneficios, módulos y clases." },
-  { href: "/admin/usuarios", titulo: "Usuarios", texto: "Creá cuentas y asigná cursos a cada alumno." },
+  { href: "/admin/ventas", titulo: "Ventas", texto: "Aprobá compras pendientes y revisá los TXID." },
+  { href: "/admin/planes", titulo: "Administrar planes", texto: "Precios, beneficios, módulos y clases." },
+  { href: "/admin/usuarios", titulo: "Usuarios", texto: "Creá cuentas y asigná planes a cada alumno." },
 ];
 
 export default function AdminHome() {
