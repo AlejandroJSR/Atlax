@@ -145,11 +145,13 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
   const faltaCotizacion = estadoTasas === "error" && necesitaConversion && conversionManual === "";
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-stretch">
+    // Container queries: se adapta al espacio real (página pública ancha o campus con sidebar), no al ancho de pantalla.
+    <div className="@container">
+    <div className="grid grid-cols-1 gap-3 sm:gap-4 @3xl:grid-cols-[minmax(0,1fr)_320px] @3xl:items-stretch">
       {/* ENTRADAS */}
-      <form className="panel" onSubmit={(e) => e.preventDefault()}>
+      <form className="panel @container/form" onSubmit={(e) => e.preventDefault()}>
         {/* Mercado: accesos directos + el resto en "Más…" */}
-        <div className="border-b border-line p-3 sm:p-5 lg:px-6">
+        <div className="border-b border-line p-3 sm:p-5 @2xl/form:px-6">
           <div className="mb-2 flex items-center justify-between gap-2">
             <span className={LABEL + " mb-0"}>Instrumento</span>
             {tieneAjustes && (
@@ -169,14 +171,14 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
               </button>
             )}
           </div>
-          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5 lg:grid lg:grid-cols-7 lg:overflow-visible" role="group" aria-label="Instrumento">
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5 @xl/form:grid @xl/form:grid-cols-7 @xl/form:overflow-visible" role="group" aria-label="Instrumento">
             {FAVORITOS.map((f) => (
               <button
                 key={f}
                 type="button"
                 onClick={() => setInstrumento(f)}
                 aria-pressed={instrumento === f}
-                className={`h-10 flex-none rounded-md border px-3 font-mono text-sm font-medium transition-colors lg:h-11 lg:px-1 ${
+                className={`h-10 flex-none rounded-md border px-3 font-mono text-sm font-medium transition-colors @xl/form:h-11 @xl/form:px-1 ${
                   instrumento === f
                     ? "border-accent bg-accent text-accent-ink"
                     : "border-line-strong text-ink hover:border-muted hover:bg-surface-2"
@@ -190,7 +192,7 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
               id="calc-instrumento"
               value={FAVORITOS.includes(instrumento) ? "" : instrumento}
               onChange={(e) => e.target.value && setInstrumento(e.target.value)}
-              className={`h-10 flex-none rounded-md border px-2 font-mono text-sm font-medium focus:border-accent focus:outline-none lg:h-11 ${
+              className={`h-10 flex-none rounded-md border px-2 font-mono text-sm font-medium focus:border-accent focus:outline-none @xl/form:h-11 ${
                 FAVORITOS.includes(instrumento) ? "border-line-strong bg-bg text-muted" : "border-accent bg-accent text-accent-ink"
               }`}
             >
@@ -240,9 +242,9 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
           )}
         </div>
 
-        <div className="grid lg:grid-cols-2">
+        <div className="grid @2xl/form:grid-cols-2">
           {/* Cuenta y riesgo */}
-          <div className="space-y-3 border-b border-line p-3 sm:p-5 lg:border-b-0 lg:border-r lg:px-6">
+          <div className="space-y-3 border-b border-line p-3 sm:p-5 @2xl/form:border-b-0 @2xl/form:border-r @2xl/form:px-6">
             <div className="grid grid-cols-2 gap-3">
               <CampoNumero
                 id="calc-balance"
@@ -285,12 +287,12 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
             {nivelRiesgo === "alto" ? (
               <p className="text-xs text-down">Más del 2% por operación: una mala racha puede vaciar la cuenta.</p>
             ) : (
-              <p className="hidden text-xs text-faint lg:block">Recomendado: entre 0,5% y 2% por operación.</p>
+              <p className="hidden text-xs text-faint @2xl/form:block">Recomendado: entre 0,5% y 2% por operación.</p>
             )}
           </div>
 
           {/* Stop loss */}
-          <div className="p-3 sm:p-5 lg:px-6">
+          <div className="p-3 sm:p-5 @2xl/form:px-6">
             <div className="mb-1 flex items-center justify-between gap-2">
               <span className="flex min-w-0 items-center gap-2" role="status">
                 <span className={LABEL + " mb-0 whitespace-nowrap"}>Stop<span className="hidden sm:inline"> loss</span></span>
@@ -331,7 +333,7 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
                 <CampoNumero id="calc-sl" valor={precioSl} onChange={setPrecioSl} sufijo="SL" placeholder="0,00" />
               </div>
             )}
-            <p className="mt-3 hidden text-xs text-faint lg:block">
+            <p className="mt-3 hidden text-xs text-faint @2xl/form:block">
               {modoStop === "distancia"
                 ? `1 ${unidadStopSing} = ${String(spec.pip).replace(".", ",")} en el precio de ${instrumento}.`
                 : "La distancia y si es compra o venta se calculan solas."}
@@ -342,11 +344,11 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
 
       {/* RESULTADO */}
       <aside aria-live="polite" className="panel flex flex-col overflow-hidden">
-        <div className="bg-accent/10 p-4 sm:p-5 lg:flex-1 lg:p-6">
+        <div className="bg-accent/10 p-4 sm:p-5 @3xl:flex-1 @3xl:p-6">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-accent-soft">Lotes a operar · {instrumento}</p>
-              <p className="font-mono text-4xl font-medium leading-tight tabular-nums text-ink sm:text-5xl lg:text-6xl">{lotesTexto}</p>
+              <p className="font-mono text-4xl font-medium leading-tight tabular-nums text-ink sm:text-5xl @3xl:text-6xl">{lotesTexto}</p>
             </div>
             {r && (
               <button type="button" onClick={copiarLotes} className="btn-secondary btn-sm h-10" aria-label="Copiar lotes">
@@ -354,7 +356,7 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
               </button>
             )}
           </div>
-          <p className="mt-1 text-sm text-ink lg:mt-3 lg:text-base">
+          <p className="mt-1 text-sm text-ink @3xl:mt-3 @3xl:text-base">
             {!r ? (
               <span className="text-muted">{faltante}</span>
             ) : r.lotesOperables === 0 ? (
@@ -367,7 +369,7 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
             )}
           </p>
           {r && r.lotesOperables > 0 && (
-            <p className="mt-4 hidden rounded-md border border-line bg-bg/60 px-3 py-2 font-mono text-xs leading-relaxed text-muted lg:block">
+            <p className="mt-4 hidden rounded-md border border-line bg-bg/60 px-3 py-2 font-mono text-xs leading-relaxed text-muted @3xl:block">
               {fmt(r.montoRiesgo)} {cuenta} ÷ ({fmt(stopPips, stopPips % 1 ? 1 : 0)} {spec.unidadStop} × {fmt(r.valorPipLote)} {cuenta})
               <br />= {fmt(r.lotes, 4)} → <span className="text-ink">{fmt(r.lotesOperables)} lotes</span>
             </p>
@@ -384,7 +386,7 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
               ],
               ["Stop", `${fmt(stopPips, stopPips % 1 ? 1 : 0)} ${spec.unidadStop}`],
             ].map(([k, v], i) => (
-              <div key={k} className={`px-4 py-2.5 lg:px-6 lg:py-3 ${i % 2 === 0 ? "border-r border-line" : ""} ${i < 2 ? "border-b border-line" : ""}`}>
+              <div key={k} className={`px-4 py-2.5 @3xl:px-6 @3xl:py-3 ${i % 2 === 0 ? "border-r border-line" : ""} ${i < 2 ? "border-b border-line" : ""}`}>
                 <dt className="text-xs text-muted">{k}</dt>
                 <dd className="font-mono tabular-nums text-ink">{v}</dd>
               </div>
@@ -393,9 +395,10 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
         )}
       </aside>
 
-      <p className="hidden text-xs text-faint sm:block lg:col-span-2">
+      <p className="hidden text-xs text-faint sm:block @3xl:col-span-2">
         Orientativo: redondeado hacia abajo a 0,01 lote. El contrato y el valor del pip pueden variar según tu broker.
       </p>
+    </div>
     </div>
   );
 }
