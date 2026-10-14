@@ -69,6 +69,15 @@ iframe {
   color-scheme: normal;
 }
 
+/* Tailwind 4 deja los botones con cursor de flecha: todo lo clickeable muestra la mano. */
+button:not(:disabled),
+[role="button"],
+[role="radio"],
+summary,
+select {
+  cursor: pointer;
+}
+
 :focus-visible {
   outline: 2px solid var(--accent-soft);
   outline-offset: 2px;
@@ -77,13 +86,13 @@ iframe {
 /* Componentes base reutilizables */
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-md bg-accent px-5 py-3 font-semibold text-accent-ink transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-accent px-5 py-3 font-semibold text-accent-ink transition-[background-color,transform,box-shadow] duration-150 hover:-translate-y-px hover:bg-accent-hover hover:shadow-[0_6px_16px_-8px_var(--accent)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-md border border-line-strong bg-transparent px-5 py-3 font-semibold text-ink transition-colors hover:border-muted hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-line-strong bg-transparent px-5 py-3 font-semibold text-ink transition-[background-color,border-color,transform] duration-150 hover:-translate-y-px hover:border-accent-soft/60 hover:bg-surface-2 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0;
   }
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-md border border-down/40 bg-transparent px-3 py-2 text-sm font-semibold text-down transition-colors hover:bg-down/10;
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-down/40 bg-transparent px-3 py-2 text-sm font-semibold text-down transition-colors hover:border-down/70 hover:bg-down/10;
   }
   .btn-sm {
     @apply px-3 py-2 text-sm;

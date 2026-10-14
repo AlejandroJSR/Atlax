@@ -19,7 +19,7 @@ export default function NavPublica() {
   return (
     <nav className="border-b border-line">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:px-6">
-        <Link href="/" className="mr-auto flex items-center gap-2 font-mono text-lg font-medium tracking-[0.2em] text-ink">
+        <Link href="/" className="mr-auto flex items-center gap-2 font-mono text-lg font-medium tracking-[0.2em] text-ink transition-opacity hover:opacity-80">
           <span className="inline-block h-2.5 w-2.5 rounded-[2px] bg-accent" aria-hidden="true" />
           ATLAX
         </Link>
@@ -58,7 +58,7 @@ export default function NavPublica() {
       {abierto && (
         <div className="flex flex-col border-t border-line px-4 pb-5 pt-2 lg:hidden">
           {LINKS.map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setAbierto(false)} className="border-b border-line py-3.5 text-ink">
+            <Link key={l.href} href={l.href} onClick={() => setAbierto(false)} className="border-b border-line py-3.5 text-ink transition-colors hover:text-accent-soft">
               {l.label}
             </Link>
           ))}

@@ -27,7 +27,7 @@ function Icon({ name, className = "h-5 w-5" }) {
 
 function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2 font-mono text-base font-medium tracking-[0.2em] text-ink">
+    <Link href="/" className="flex items-center gap-2 font-mono text-base font-medium tracking-[0.2em] text-ink transition-opacity hover:opacity-80">
       <span className="inline-block h-2 w-2 rounded-[2px] bg-accent" aria-hidden="true" />
       ATLAX
     </Link>

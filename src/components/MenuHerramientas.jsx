@@ -97,7 +97,7 @@ export function GrupoHerramientasMovil({ onNavegar }) {
         type="button"
         onClick={() => setAbierto((a) => !a)}
         aria-expanded={abierto}
-        className="flex w-full items-center justify-between py-3.5 text-left text-ink"
+        className="flex w-full items-center justify-between py-3.5 text-left text-ink transition-colors hover:text-accent-soft"
       >
         Herramientas
         <Flecha abierto={abierto} />

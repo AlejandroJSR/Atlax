@@ -346,7 +346,7 @@ export default function Home() {
         }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6">
-          <a href="#inicio" className="flex items-center gap-2 font-mono text-lg font-medium tracking-[0.2em] text-ink">
+          <a href="#inicio" className="flex items-center gap-2 font-mono text-lg font-medium tracking-[0.2em] text-ink transition-opacity hover:opacity-80">
             <span className="inline-block h-2.5 w-2.5 rounded-[2px] bg-accent" aria-hidden="true" />
             ATLAX
           </a>
@@ -388,7 +388,7 @@ export default function Home() {
               l.herramientas ? (
                 <GrupoHerramientasMovil key="herramientas" onNavegar={() => setMenuOpen(false)} />
               ) : (
-                <a key={l.href} className="border-b border-line py-3.5 text-ink" href={l.href} onClick={() => setMenuOpen(false)}>
+                <a key={l.href} className="border-b border-line py-3.5 text-ink transition-colors hover:text-accent-soft" href={l.href} onClick={() => setMenuOpen(false)}>
                   {l.label}
                 </a>
               )
@@ -595,7 +595,7 @@ export default function Home() {
           ) : cursos.length === 0 ? (
             <p className="rounded-2xl border border-line bg-surface p-7 text-muted">
               No hay cursos abiertos en este momento. Escríbenos a{" "}
-              <a className="text-accent-soft underline" href={`mailto:${EMAIL_CONTACTO}`}>{EMAIL_CONTACTO}</a>{" "}
+              <a className="text-accent-soft underline transition-colors hover:text-ink" href={`mailto:${EMAIL_CONTACTO}`}>{EMAIL_CONTACTO}</a>{" "}
               para conocer la próxima apertura.
             </p>
           ) : (

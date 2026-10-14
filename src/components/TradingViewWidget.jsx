@@ -25,16 +25,8 @@ function TradingViewWidget({ theme = "dark" }) {
     [theme]
   );
 
-  return (
-    <div>
-      <div ref={container} />
-      <div className="tradingview-widget-copyright">
-        <a href="https://es.tradingview.com/" rel="noopener nofollow" target="_blank">
-          <span className="blue-text">Siga los mercados en TradingView</span>
-        </a>
-      </div>
-    </div>
-  );
+  // Sin el texto "Siga los mercados en TradingView": el ticker ya muestra el logo de TradingView.
+  return <div ref={container} />;
 }
 
 export default memo(TradingViewWidget);
