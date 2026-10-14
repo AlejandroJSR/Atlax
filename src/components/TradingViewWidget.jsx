@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, memo } from 'react';
 
-function TradingViewWidget() {
+function TradingViewWidget({ theme = "dark" }) {
   const container = useRef();
 
   useEffect(() => {
@@ -12,20 +12,22 @@ function TradingViewWidget() {
     script.innerHTML = `
       {
         "symbols": [
-          { "proName": "FX_IDC:EURUSD", "title": "EURUSD" },
-          { "proName": "OANDA:AUDUSD", "title": "AUDUSD" },
+          { "proName": "CAPITALCOM:US100", "title": "NAS100" },
+          { "proName": "CAPITALCOM:US500", "title": "SPX500" },
           { "proName": "CAPITALCOM:US30", "title": "US30" },
-          { "proName": "OKX:BTCUSD", "title": "BTCUSD" }
+          { "proName": "CAPITALCOM:DE40", "title": "GER40" },
+          { "proName": "OANDA:XAUUSD", "title": "XAUUSD" },
+          { "proName": "BITSTAMP:BTCUSD", "title": "BTCUSD" }
         ],
-        "colorTheme": "dark",
+        "colorTheme": "${theme}",
         "locale": "es",
         "largeChartUrl": "",
         "isTransparent": true,
         "showSymbolLogo": true,
-        "displayMode": "adaptive"
+        "displayMode": "regular"
       }`;
     container.current.appendChild(script);
-  }, []);
+  }, [theme]);
 
   return (
     <div className="tradingview-widget-container" ref={container}>

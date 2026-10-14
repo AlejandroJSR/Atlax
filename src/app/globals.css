@@ -42,6 +42,11 @@
   --font-mono: var(--font-plex-mono);
 }
 
+/* Tipografía de la landing pública (Sora). */
+.font-landing {
+  font-family: var(--font-sora), ui-sans-serif, sans-serif;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 4rem;
@@ -168,6 +173,29 @@ iframe {
   .animate-fadein {
     animation: fadein 0.18s ease-out;
   }
+
+  /* Aparición al hacer scroll (ver <Reveal> en la landing) */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, border-color 0.2s ease;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @keyframes grow-x {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  .is-visible .animate-grow-x {
+    animation: grow-x 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
