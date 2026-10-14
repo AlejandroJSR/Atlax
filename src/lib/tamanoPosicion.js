@@ -81,9 +81,10 @@ export function distanciaEnPips(entrada, stopLoss, pip) {
 /**
  * balance: saldo de la cuenta · riesgoPct: % a arriesgar · stopPips: distancia del stop (pips o puntos)
  * pip / contrato: especificación · conversion: 1 quote = conversion de la cuenta
+ * pasoLote: incremento mínimo que acepta el broker (0,01 en la mayoría; algunos 0,1 o 1)
  */
-export function calcularPosicion({ balance, riesgoPct, stopPips, pip, contrato, conversion }) {
-  if (!(balance > 0) || !(riesgoPct > 0) || !(stopPips > 0) || !(pip > 0) || !(contrato > 0) || !(conversion > 0)) {
+export function calcularPosicion({ balance, riesgoPct, stopPips, pip, contrato, conversion, pasoLote = 0.01 }) {
+  if (!(balance > 0) || !(riesgoPct > 0) || !(stopPips > 0) || !(pip > 0) || !(contrato > 0) || !(conversion > 0) || !(pasoLote > 0)) {
     return null;
   }
   const montoRiesgo = (balance * riesgoPct) / 100;
@@ -91,8 +92,10 @@ export function calcularPosicion({ balance, riesgoPct, stopPips, pip, contrato, 
   const valorPipLote = valorPipUnidad * contrato;
   const unidades = montoRiesgo / (stopPips * valorPipUnidad);
   const lotes = unidades / contrato;
-  // Los brokers aceptan pasos de 0,01 lote: se redondea hacia abajo para no superar el riesgo.
-  const lotesOperables = Math.floor(lotes * 100 + 1e-9) / 100;
+  // Se redondea hacia abajo al paso del broker para no superar el riesgo.
+  // toFixed con los decimales del paso elimina el ruido de punto flotante (0,1 × 3 = 0,30000000000000004).
+  const decimales = (String(pasoLote).split(".")[1] || "").length;
+  const lotesOperables = Number((Math.floor(lotes / pasoLote + 1e-9) * pasoLote).toFixed(decimales));
   const riesgoReal = lotesOperables * valorPipLote * stopPips;
   return { montoRiesgo, valorPipLote, unidades, lotes, lotesOperables, riesgoReal };
 }

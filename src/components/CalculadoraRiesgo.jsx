@@ -67,6 +67,8 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
   const [contratoManual, setContratoManual] = useState("");
   const [copiado, setCopiado] = useState(false);
   const [ajustesAbiertos, setAjustesAbiertos] = useState(false);
+  // El paso de lote es del broker, no del instrumento: se conserva al cambiar de par.
+  const [pasoLoteManual, setPasoLoteManual] = useState("");
 
   // Tipos de cambio de referencia del BCE (gratis, sin clave). Base = divisa de la cuenta.
   useEffect(() => {
@@ -104,6 +106,9 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
   const conversionAuto = conversionACuenta(spec.quote, cuenta, tasas);
   const conversion = conversionManual !== "" ? num(conversionManual) : conversionAuto;
   const necesitaConversion = spec.quote !== cuenta;
+  const pasoLote = pasoLoteManual !== "" ? num(pasoLoteManual) : 0.01;
+  const pasoTexto = fmt(pasoLote, (String(pasoLote).split(".")[1] || "").length);
+  const personalizado = contratoManual !== "" || pasoLoteManual !== "" || conversionManual !== "";
 
   const r = useMemo(
     () =>
@@ -114,8 +119,9 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
         pip: spec.pip,
         contrato: spec.contrato,
         conversion,
+        pasoLote,
       }),
-    [balance, riesgo, stopPips, spec.pip, spec.contrato, conversion]
+    [balance, riesgo, stopPips, spec.pip, spec.contrato, conversion, pasoLote]
   );
 
   const riesgoNum = num(riesgo);
@@ -141,7 +147,6 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
     : null;
 
   const lotesTexto = r ? fmt(r.lotesOperables) : "—";
-  const tieneAjustes = spec.variable || necesitaConversion;
   const faltaCotizacion = estadoTasas === "error" && necesitaConversion && conversionManual === "";
 
   return (
@@ -154,22 +159,28 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
         <div className="border-b border-line p-3 sm:p-5 @2xl/form:px-6">
           <div className="mb-2 flex items-center justify-between gap-2">
             <span className={LABEL + " mb-0"}>Instrumento</span>
-            {tieneAjustes && (
-              <button
-                type="button"
-                onClick={() => setAjustesAbiertos((a) => !a)}
-                aria-expanded={ajustesAbiertos}
-                className={`inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors hover:bg-surface-2 ${
-                  faltaCotizacion ? "text-warn" : "text-muted hover:text-ink"
-                }`}
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-                  <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0" strokeLinecap="round" />
-                  <circle cx="16" cy="6" r="2" /><circle cx="10" cy="12" r="2" /><circle cx="18" cy="18" r="2" />
-                </svg>
-                {faltaCotizacion ? "Falta tipo de cambio" : "Ajustes del broker"}
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setAjustesAbiertos((a) => !a)}
+              aria-expanded={ajustesAbiertos}
+              className={`inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors hover:bg-surface-2 ${
+                faltaCotizacion ? "text-warn" : personalizado ? "text-accent-soft" : "text-muted hover:text-ink"
+              }`}
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+                <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0" strokeLinecap="round" />
+                <circle cx="16" cy="6" r="2" /><circle cx="10" cy="12" r="2" /><circle cx="18" cy="18" r="2" />
+              </svg>
+              {faltaCotizacion ? (
+                "Falta tipo de cambio"
+              ) : (
+                <>
+                  <span className="hidden sm:inline">Configurar según broker</span>
+                  <span className="sm:hidden">Broker</span>
+                  <span className="font-normal text-faint">{personalizado ? "· personalizado" : "· opcional"}</span>
+                </>
+              )}
+            </button>
           </div>
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5 @xl/form:grid @xl/form:grid-cols-7 @xl/form:overflow-visible" role="group" aria-label="Instrumento">
             {FAVORITOS.map((f) => (
@@ -205,22 +216,46 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
             </select>
           </div>
 
-          {/* Ajustes del broker (solo cuando aplican) */}
-          {tieneAjustes && ajustesAbiertos && (
-            <div className="mt-3 grid gap-3 rounded-md border border-line bg-bg/50 p-3 sm:grid-cols-2">
-              {spec.variable && (
-                <div>
-                  <CampoNumero
-                    id="calc-contrato"
-                    label="Contrato por lote"
-                    valor={contratoManual}
-                    onChange={setContratoManual}
-                    placeholder={String(base.contrato)}
-                    sufijo={spec.unidadContrato}
-                  />
-                  <p className="mt-1 text-xs text-faint">Por defecto {base.contrato}. Revisalo en tu plataforma.</p>
-                </div>
-              )}
+          {/* Configuración según broker: opcional, los valores por defecto sirven para la mayoría */}
+          {ajustesAbiertos && (
+            <div className="mt-3 rounded-md border border-line bg-bg/50 p-3">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <p className="text-xs text-muted">Solo si tu broker usa otros valores. Si no, dejalo vacío.</p>
+                {personalizado && (
+                  <button
+                    type="button"
+                    onClick={() => { setContratoManual(""); setPasoLoteManual(""); setConversionManual(""); }}
+                    className="flex-none text-xs font-medium text-accent-soft hover:underline"
+                  >
+                    Restablecer
+                  </button>
+                )}
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 @2xl/form:grid-cols-3">
+              <div>
+                <CampoNumero
+                  id="calc-contrato"
+                  label="Contrato por lote"
+                  valor={contratoManual}
+                  onChange={setContratoManual}
+                  placeholder={base.contrato.toLocaleString("es-AR")}
+                  sufijo={spec.unidadContrato}
+                />
+                <p className="mt-1 text-xs text-faint">
+                  {spec.unidadContrato === "unidades" ? "Estándar 100.000 · mini 10.000 · micro 1.000" : `Por defecto ${base.contrato}. Revisalo en tu plataforma.`}
+                </p>
+              </div>
+              <div>
+                <CampoNumero
+                  id="calc-paso"
+                  label="Paso de lote"
+                  valor={pasoLoteManual}
+                  onChange={setPasoLoteManual}
+                  placeholder="0,01"
+                  sufijo="lotes"
+                />
+                <p className="mt-1 text-xs text-faint">El mínimo que te deja operar (0,01 · 0,1 · 1).</p>
+              </div>
               {necesitaConversion && (
                 <div>
                   <CampoNumero
@@ -238,6 +273,7 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
                   </p>
                 </div>
               )}
+              </div>
             </div>
           )}
         </div>
@@ -360,7 +396,7 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
             {!r ? (
               <span className="text-muted">{faltante}</span>
             ) : r.lotesOperables === 0 ? (
-              <span className="text-warn">No alcanza para 0,01 lotes: achicá el stop o subí el riesgo.</span>
+              <span className="text-warn">No alcanza para {pasoTexto} lotes: achicá el stop o subí el riesgo.</span>
             ) : (
               <>
                 Si toca el SL perdés{" "}
@@ -396,7 +432,7 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
       </aside>
 
       <p className="hidden text-xs text-faint sm:block @3xl:col-span-2">
-        Orientativo: redondeado hacia abajo a 0,01 lote. El contrato y el valor del pip pueden variar según tu broker.
+        Orientativo: redondeado hacia abajo a {pasoTexto} lote. El contrato y el valor del pip pueden variar según tu broker.
       </p>
     </div>
     </div>
