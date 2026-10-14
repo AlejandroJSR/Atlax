@@ -28,11 +28,24 @@ const FAVORITOS = ["EUR/USD", "GBP/USD", "XAU/USD", "US30", "US100", "BTC/USD"];
 /** Calculadora de tamaño de posición. La usan /alumnos/calculadora y la landing (uso libre). */
 
 /** Campo numérico compacto (44px) con la unidad visible dentro. */
-function CampoNumero({ id, label, valor, onChange, sufijo, adorno, placeholder, title }) {
+// Escala de riesgo por operación, de verde a rojo. Siempre color + palabra (nunca solo color).
+const NIVELES = [
+  { hasta: 0.5, nombre: "Óptimo", color: "#3ddc84" },
+  { hasta: 1, nombre: "Conservador", color: "#a3e635" },
+  { hasta: 2, nombre: "Moderado", color: "#f5b041" },
+  { hasta: 3, nombre: "Agresivo", color: "#fb7a3c" },
+  { hasta: Infinity, nombre: "Muy arriesgado", color: "#ff5c5c" },
+];
+const nivelDe = (pct) => (pct > 0 ? NIVELES.find((n) => pct <= n.hasta) : null);
+// La barra va de 0% a 5%: las paradas del degradado coinciden con los cortes de NIVELES.
+const ESCALA_MAX = 5;
+const DEGRADADO = "linear-gradient(to right, #3ddc84 0%, #3ddc84 10%, #a3e635 20%, #f5b041 40%, #fb7a3c 60%, #ff5c5c 100%)";
+
+function CampoNumero({ id, label, valor, onChange, sufijo, adorno, barra, placeholder, title }) {
   return (
     <div className="min-w-0">
       {label && <label className={LABEL} htmlFor={id}>{label}</label>}
-      <div className="flex h-11 items-stretch overflow-hidden rounded-md border border-line bg-bg transition-colors focus-within:border-accent" title={title}>
+      <div className="relative flex h-11 items-stretch overflow-hidden rounded-md border border-line bg-bg transition-colors focus-within:border-accent" title={title}>
         <input
           id={id}
           inputMode="decimal"
@@ -46,6 +59,7 @@ function CampoNumero({ id, label, valor, onChange, sufijo, adorno, placeholder, 
           <span className="flex items-center border-l border-line bg-surface-2 px-2.5 font-mono text-xs text-muted">{sufijo}</span>
         )}
         {adorno}
+        {barra}
       </div>
     </div>
   );
@@ -125,7 +139,8 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
   );
 
   const riesgoNum = num(riesgo);
-  const nivelRiesgo = !(riesgoNum > 0) ? null : riesgoNum <= 1 ? "conservador" : riesgoNum <= 2 ? "moderado" : "alto";
+  const nivel = nivelDe(riesgoNum);
+  const posBarra = Math.min(100, Math.max(0, (riesgoNum / ESCALA_MAX) * 100));
 
   const copiarLotes = async () => {
     if (!r) return;
@@ -301,30 +316,58 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
                   </>
                 }
               />
-              <CampoNumero id="calc-riesgo" label="Riesgo" valor={riesgo} onChange={setRiesgo} sufijo="%" />
+              <CampoNumero
+                id="calc-riesgo"
+                label={
+                  <span className="flex items-baseline gap-1.5 whitespace-nowrap">
+                    Riesgo
+                    {nivel && <span style={{ color: nivel.color }}>· {nivel.nombre}</span>}
+                  </span>
+                }
+                valor={riesgo}
+                onChange={setRiesgo}
+                sufijo="%"
+                barra={
+                  <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px] opacity-80" style={{ background: DEGRADADO }}>
+                    {nivel && (
+                      <span
+                        className="absolute -top-[3px] h-[9px] w-[3px] rounded-full bg-ink shadow transition-[left] duration-200"
+                        style={{ left: `calc(${posBarra}% - 1.5px)` }}
+                      />
+                    )}
+                  </span>
+                }
+              />
             </div>
             <div className="grid grid-cols-4 gap-2" role="group" aria-label="Riesgo rápido">
-              {PRESETS_RIESGO.map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setRiesgo(p)}
-                  aria-pressed={riesgo === p}
-                  className={`h-10 rounded-md border font-mono text-sm transition-colors ${
-                    riesgo === p
-                      ? "border-accent bg-accent/15 text-accent-soft"
-                      : "border-line text-muted hover:border-line-strong hover:text-ink"
-                  }`}
-                >
-                  {p.replace(".", ",")}%
-                </button>
-              ))}
+              {PRESETS_RIESGO.map((p) => {
+                const n = nivelDe(num(p));
+                const activo = riesgo === p;
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setRiesgo(p)}
+                    aria-pressed={activo}
+                    title={n.nombre}
+                    className={`flex h-10 items-center justify-center gap-1.5 rounded-md border font-mono text-sm transition-colors ${
+                      activo ? "" : "border-line text-muted hover:border-line-strong hover:text-ink"
+                    }`}
+                    style={activo ? { borderColor: n.color, backgroundColor: `${n.color}1f`, color: n.color } : undefined}
+                  >
+                    <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: n.color }} />
+                    {p.replace(".", ",")}%
+                  </button>
+                );
+              })}
             </div>
-            {nivelRiesgo === "alto" ? (
-              <p className="text-xs text-down">Más del 2% por operación: una mala racha puede vaciar la cuenta.</p>
-            ) : (
-              <p className="hidden text-xs text-faint @2xl/form:block">Recomendado: entre 0,5% y 2% por operación.</p>
-            )}
+            <p className="hidden text-xs @2xl/form:block" style={nivel && nivel.hasta > 2 ? { color: nivel.color } : undefined}>
+              {nivel && nivel.hasta > 2 ? (
+                "Más del 2% por operación: una mala racha puede vaciar la cuenta."
+              ) : (
+                <span className="text-faint">Recomendado: entre 0,5% y 2% por operación.</span>
+              )}
+            </p>
           </div>
 
           {/* Stop loss */}
@@ -414,17 +457,17 @@ export default function CalculadoraRiesgo({ instrumentoInicial = "EUR/USD" }) {
         {r && (
           <dl className="hidden grid-cols-2 border-t border-line text-sm sm:grid">
             {[
-              ["Riesgo", `${fmt((r.riesgoReal / num(balance)) * 100)}%`],
+              ["Riesgo", `${fmt((r.riesgoReal / num(balance)) * 100)}% · ${nivelDe((r.riesgoReal / num(balance)) * 100)?.nombre ?? ""}`, nivelDe((r.riesgoReal / num(balance)) * 100)?.color],
               [`Por ${unidadStopSing}`, `${fmt(r.valorPipLote * r.lotesOperables)} ${cuenta}`],
               [
                 spec.unidadContrato === "unidades" ? "Unidades" : spec.unidadContrato === "contratos" ? "Contratos" : spec.unidadContrato,
                 fmt(r.lotesOperables * spec.contrato, r.lotesOperables * spec.contrato < 10 ? 2 : 0),
               ],
               ["Stop", `${fmt(stopPips, stopPips % 1 ? 1 : 0)} ${spec.unidadStop}`],
-            ].map(([k, v], i) => (
+            ].map(([k, v, color], i) => (
               <div key={k} className={`px-4 py-2.5 @3xl:px-6 @3xl:py-3 ${i % 2 === 0 ? "border-r border-line" : ""} ${i < 2 ? "border-b border-line" : ""}`}>
                 <dt className="text-xs text-muted">{k}</dt>
-                <dd className="font-mono tabular-nums text-ink">{v}</dd>
+                <dd className="font-mono tabular-nums text-ink" style={color ? { color } : undefined}>{v}</dd>
               </div>
             ))}
           </dl>
