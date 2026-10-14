@@ -195,10 +195,11 @@ export default function CalendarioEconomico() {
           </div>
         )}
         <div className="relative min-h-0 flex-1 overflow-hidden">
-          {/* Zoom: el widget se dibuja más grande y se escala, para ver más eventos sin scrollear. */}
+          {/* Zoom con la propiedad CSS zoom (no transform: scale, que reduce una imagen ya dibujada y
+              se ve pixelado con escala de Windows 125–150%). zoom vuelve a dibujar el texto nítido. */}
           <div
             className="absolute left-0 top-0"
-            style={{ width: `${100 / escala}%`, height: `${100 / escala}%`, transform: `scale(${escala})`, transformOrigin: "0 0" }}
+            style={{ width: "100%", height: "100%", zoom: escala }}
           >
             {cargadas && (
               <WidgetEventos paises={paises} importancia={importancia} intento={intento} onEstado={setEstado} />
