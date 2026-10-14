@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
+import MenuHerramientas, { GrupoHerramientasMovil, HERRAMIENTAS } from "@/components/MenuHerramientas";
 
 // Firebase
 import { db, auth } from "@/services/firebase";
@@ -176,6 +177,17 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [showStickyCta, setShowStickyCta] = useState(false);
 
+  // "Acceso alumnos" desde otras páginas (p. ej. las herramientas) llega como /?acceso: abre el login.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("acceso")) {
+      setShowLogin(true);
+      params.delete("acceso");
+      const resto = params.toString();
+      window.history.replaceState(null, "", window.location.pathname + (resto ? `?${resto}` : "") + window.location.hash);
+    }
+  }, []);
+
   useEffect(() => {
     const fetchCursos = async () => {
       try {
@@ -318,9 +330,9 @@ export default function Home() {
     { href: "#programa", label: "Programa" },
     { href: "#cursos", label: "Cursos" },
     { href: "#inscripcion", label: "Inscripción" },
-    { href: "/calculadora", label: "Calculadora" },
     { href: "#faq", label: "Preguntas" },
     { href: "#contacto", label: "Contacto" },
+    { herramientas: true }, // desplegable con calculadora y calendario, al final junto a "Acceso alumnos"
   ];
 
   const tab = programa[tabPrograma];
@@ -339,13 +351,19 @@ export default function Home() {
             ATLAX
           </a>
           <ul className="ml-auto hidden items-center gap-1 lg:flex">
-            {navLinks.map((l) => (
-              <li key={l.href}>
-                <a className="rounded-md px-3 py-2.5 text-sm text-muted transition-colors hover:text-ink" href={l.href}>
-                  {l.label}
-                </a>
-              </li>
-            ))}
+            {navLinks.map((l) =>
+              l.herramientas ? (
+                <li key="herramientas">
+                  <MenuHerramientas />
+                </li>
+              ) : (
+                <li key={l.href}>
+                  <a className="rounded-md px-3 py-2.5 text-sm text-muted transition-colors hover:text-ink" href={l.href}>
+                    {l.label}
+                  </a>
+                </li>
+              )
+            )}
             <li className="ml-3">
               <button className="btn-secondary btn-sm" onClick={() => setShowLogin(true)} type="button">
                 Acceso alumnos
@@ -366,11 +384,15 @@ export default function Home() {
         </div>
         {menuOpen && (
           <div className="flex flex-col border-t border-line bg-bg px-4 pb-5 pt-2 lg:hidden">
-            {navLinks.map((l) => (
-              <a key={l.href} className="border-b border-line py-3.5 text-ink" href={l.href} onClick={() => setMenuOpen(false)}>
-                {l.label}
-              </a>
-            ))}
+            {navLinks.map((l) =>
+              l.herramientas ? (
+                <GrupoHerramientasMovil key="herramientas" onNavegar={() => setMenuOpen(false)} />
+              ) : (
+                <a key={l.href} className="border-b border-line py-3.5 text-ink" href={l.href} onClick={() => setMenuOpen(false)}>
+                  {l.label}
+                </a>
+              )
+            )}
             <button
               className="btn-primary mt-4"
               type="button"
@@ -439,7 +461,8 @@ export default function Home() {
               Estrategias de trading en CFDs pensadas para gestionar capital y superar pruebas de fondeo. Clases en vivo, seguimiento diario del mercado y acompañamiento personal hasta que lo domines.
             </p>
             <div className="animate-fadeInUp flex flex-wrap gap-3" style={{ animationDelay: "180ms" }}>
-              <a href="#cursos" className="btn-primary group rounded-lg px-6 py-3.5 shadow-[0_10px_30px_-10px_var(--accent)]">
+              {/* Menos brillante: sin resplandor y con el violeta un poco atenuado; se aviva al pasar el mouse. */}
+              <a href="#cursos" className="btn-primary group rounded-lg bg-accent/80 px-6 py-3.5 text-white/95 hover:bg-accent">
                 Ver cursos y precios
                 <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
               </a>
@@ -758,24 +781,42 @@ export default function Home() {
       {/* HERRAMIENTAS (uso libre, en página aparte) */}
       <section id="herramientas" className="border-t border-line py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <Reveal>
-            <a
-              href="/calculadora"
-              className="group flex flex-col items-start justify-between gap-6 rounded-2xl border border-line bg-surface p-7 transition-colors hover:border-accent sm:p-9 md:flex-row md:items-center"
-            >
-              <div>
-                <p className="mb-3 font-mono text-xs uppercase tracking-wider text-up">Herramienta gratuita</p>
-                <h2 className="mb-2 text-3xl font-bold tracking-tight text-ink">Calculadora de riesgo</h2>
-                <p className="max-w-xl text-muted">
-                  Calcula cuántos lotes operar para perder solo el % que elegiste si toca el stop. Índices, oro, divisas y cripto. Sin registrarte.
-                </p>
-              </div>
-              <span className="btn-primary flex-none rounded-lg px-6 py-3.5">
-                Abrir calculadora
-                <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
-              </span>
-            </a>
+          <Reveal className="mb-10">
+            <p className="mb-3 font-mono text-xs uppercase tracking-wider text-up">Herramientas gratuitas</p>
+            <h2 className="text-4xl font-bold tracking-tight text-ink">Opera con información, no a ciegas</h2>
           </Reveal>
+          <div className="grid gap-6 md:grid-cols-2">
+            {[
+              {
+                href: "/calculadora",
+                titulo: "Calculadora de riesgo",
+                texto: "Cuántos lotes operar para perder solo el % que elegiste si toca el stop. Índices, oro, divisas y cripto.",
+                accion: "Abrir calculadora",
+              },
+              {
+                href: "/calendario",
+                titulo: "Calendario económico",
+                texto: "Las noticias del día con impacto, previsión y el dato real apenas se publica, en tu zona horaria.",
+                accion: "Abrir calendario",
+              },
+            ].map((h, i) => (
+              <Reveal key={h.href} delay={i * 120}>
+                <a
+                  href={h.href}
+                  className="group flex h-full flex-col justify-between gap-6 rounded-2xl border border-line bg-surface p-7 transition-colors hover:border-accent sm:p-9"
+                >
+                  <div>
+                    <h3 className="mb-2 text-2xl font-bold tracking-tight text-ink">{h.titulo}</h3>
+                    <p className="text-muted">{h.texto} Sin registrarte.</p>
+                  </div>
+                  <span className="btn-primary self-start rounded-lg px-6 py-3.5">
+                    {h.accion}
+                    <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
+                  </span>
+                </a>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -832,11 +873,13 @@ export default function Home() {
             </a>
           </div>
           <ul className="grid grid-cols-2 gap-x-10 gap-y-1 text-sm sm:flex sm:gap-2">
-            {navLinks.map((l) => (
-              <li key={l.href}>
-                <a href={l.href} className="inline-block py-2.5 text-muted hover:text-ink sm:px-2">{l.label}</a>
-              </li>
-            ))}
+            {navLinks
+              .flatMap((l) => (l.herramientas ? HERRAMIENTAS.map((h) => ({ href: h.href, label: h.titulo })) : [l]))
+              .map((l) => (
+                <li key={l.href}>
+                  <a href={l.href} className="inline-block py-2.5 text-muted hover:text-ink sm:px-2">{l.label}</a>
+                </li>
+              ))}
           </ul>
         </div>
         <div className="mx-auto mt-10 max-w-7xl border-t border-line px-4 pt-6 sm:px-6">
