@@ -13,7 +13,7 @@
   --muted: #9aa3ae;
   --faint: #6b7380;
   --accent: #5b47db;
-  --accent-hover: #4a37c4;
+  --accent-hover: #6e5bea; /* más claro: sobre fondo oscuro el hover se nota al aclarar, no al oscurecer */
   --accent-soft: #a99cff;
   --accent-ink: #ffffff;
   --up: #3ddc84;
@@ -52,6 +52,14 @@ html {
   scroll-padding-top: 4rem;
 }
 
+/* Notebooks de ~14" (1024–1600px): todo un 6% más chico para que la vista quede más "lejos".
+   Textos, espacios y botones están en rem, así que escalan parejo. */
+@media (min-width: 1024px) and (max-width: 1600px) {
+  html {
+    font-size: 15px;
+  }
+}
+
 body {
   background: var(--bg);
   color: var(--ink);
@@ -86,10 +94,10 @@ select {
 /* Componentes base reutilizables */
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-md bg-accent px-5 py-3 font-semibold text-accent-ink transition-[background-color,transform,box-shadow] duration-150 hover:-translate-y-px hover:bg-accent-hover hover:shadow-[0_6px_16px_-8px_var(--accent)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-accent px-5 py-3 font-semibold text-accent-ink transition-[background-color,translate,box-shadow] duration-150 hover:-translate-y-0.5 hover:bg-accent-hover hover:shadow-[0_8px_22px_-8px_var(--accent)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-md border border-line-strong bg-transparent px-5 py-3 font-semibold text-ink transition-[background-color,border-color,transform] duration-150 hover:-translate-y-px hover:border-accent-soft/60 hover:bg-surface-2 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0;
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-line-strong bg-transparent px-5 py-3 font-semibold text-ink transition-[background-color,border-color,color,translate] duration-150 hover:-translate-y-0.5 hover:border-accent hover:bg-accent/15 hover:text-white active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0;
   }
   .btn-danger {
     @apply inline-flex items-center justify-center gap-2 rounded-md border border-down/40 bg-transparent px-3 py-2 text-sm font-semibold text-down transition-colors hover:border-down/70 hover:bg-down/10;

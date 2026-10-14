@@ -59,7 +59,7 @@ export default function MenuHerramientas({ className = "" }) {
         onClick={() => setAbierto((a) => !a)}
         aria-expanded={abierto}
         aria-haspopup="true"
-        className={`flex items-center gap-1 rounded-md px-3 py-2.5 text-sm transition-colors hover:text-ink ${abierto ? "text-ink" : "text-muted"}`}
+        className={`flex items-center gap-1 rounded-md px-3 py-2.5 text-sm transition-colors hover:bg-surface-2 hover:text-ink ${abierto ? "text-ink" : "text-muted"}`}
       >
         Herramientas
         <Flecha abierto={abierto} />

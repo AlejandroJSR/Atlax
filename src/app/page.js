@@ -358,7 +358,7 @@ export default function Home() {
                 </li>
               ) : (
                 <li key={l.href}>
-                  <a className="rounded-md px-3 py-2.5 text-sm text-muted transition-colors hover:text-ink" href={l.href}>
+                  <a className="rounded-md px-3 py-2.5 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-ink" href={l.href}>
                     {l.label}
                   </a>
                 </li>
@@ -462,7 +462,7 @@ export default function Home() {
             </p>
             <div className="animate-fadeInUp flex flex-wrap gap-3" style={{ animationDelay: "180ms" }}>
               {/* Menos brillante: sin resplandor y con el violeta un poco atenuado; se aviva al pasar el mouse. */}
-              <a href="#cursos" className="btn-primary group rounded-lg bg-accent/80 px-6 py-3.5 text-white/95 hover:bg-accent">
+              <a href="#cursos" className="btn-primary group rounded-lg bg-accent/80 px-6 py-3.5 text-white/95 hover:bg-accent-hover">
                 Ver cursos y precios
                 <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
               </a>

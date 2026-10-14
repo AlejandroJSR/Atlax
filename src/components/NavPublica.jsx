@@ -27,7 +27,7 @@ export default function NavPublica() {
         <ul className="hidden items-center gap-1 lg:flex">
           {LINKS.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="rounded-md px-3 py-2.5 text-sm text-muted transition-colors hover:text-ink">
+              <Link href={l.href} className="rounded-md px-3 py-2.5 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-ink">
                 {l.label}
               </Link>
             </li>
