@@ -182,7 +182,7 @@ function AlumnosPage() {
 
   // Migas de pan: reemplazan los botones "Volver" y muestran dónde está el alumno.
   const Migas = () => {
-    const pasos = [{ label: "Mis cursos", vista: "cursos" }];
+    const pasos = [{ label: "Mi programa", vista: "cursos" }];
     if (cursoActivo && vista !== "cursos") pasos.push({ label: cursoActivo.nombre, vista: "modulos" });
     if (moduloActivo != null && (vista === "clases" || vista === "clase"))
       pasos.push({ label: `Módulo ${moduloActivo + 1}`, vista: "clases" });
@@ -230,7 +230,7 @@ function AlumnosPage() {
           <h1 className="page-title mb-1">Hola, trader</h1>
           <p className="mb-8 text-muted">Retomá donde lo dejaste.</p>
           {loadingCursos || loading ? (
-            <div className="grid gap-4 md:grid-cols-2" aria-busy="true" aria-label="Cargando cursos">
+            <div className="grid gap-4 md:grid-cols-2" aria-busy="true" aria-label="Cargando tu programa">
               {[1, 2].map((n) => (
                 <div key={n} className="panel animate-pulse p-6">
                   <div className="mb-3 h-5 w-2/3 rounded bg-surface-2" />
@@ -241,7 +241,7 @@ function AlumnosPage() {
             </div>
           ) : cursos.length === 0 ? (
             <div className="panel px-6 py-12 text-center">
-              <p className="font-medium text-ink">Todavía no tenés cursos aprobados</p>
+              <p className="font-medium text-ink">Todavía no tenés un plan activo</p>
               <p className="mx-auto mt-1 max-w-sm text-sm text-muted">
                 Si ya pagaste, tu compra está en revisión. Te avisamos apenas se apruebe.
               </p>
@@ -265,7 +265,7 @@ function AlumnosPage() {
                   <span className="mb-2 text-lg font-semibold text-ink">{curso.nombre}</span>
                   <span className="mb-5 text-sm leading-relaxed text-muted">{curso.descripcion || ""}</span>
                   <span className="mt-auto inline-flex items-center gap-2 text-sm font-medium text-accent-soft">
-                    Entrar al curso <span aria-hidden="true">→</span>
+                    Entrar <span aria-hidden="true">→</span>
                   </span>
                 </button>
               ))}
@@ -280,7 +280,7 @@ function AlumnosPage() {
           <Migas />
           <h2 className="page-title mb-6">{cursoActivo.nombre}</h2>
           {(cursoActivo.modulos || []).length === 0 ? (
-            <p className="text-muted">Este curso todavía no tiene módulos publicados.</p>
+            <p className="text-muted">Este plan todavía no tiene módulos publicados.</p>
           ) : (
             <ol className="panel divide-y divide-line overflow-hidden">
               {(cursoActivo.modulos || []).map((modulo, idx) => (

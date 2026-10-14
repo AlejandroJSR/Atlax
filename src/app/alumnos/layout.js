@@ -7,7 +7,7 @@ import { auth } from "@/services/firebase";
 import AppSidebar from "@/components/AppSidebar";
 
 const menuItems = [
-  { icon: "book", label: "Mis cursos", href: "/alumnos", exact: true },
+  { icon: "book", label: "Mi programa", href: "/alumnos", exact: true },
   { icon: "calculator", label: "Calculadora de riesgo", href: "/alumnos/calculadora" },
   { icon: "calendar", label: "Calendario económico", href: "/alumnos/calendario" },
 ];
