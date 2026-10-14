@@ -1,12 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import {
-  INSTRUMENTOS,
+  GRUPOS,
   DIVISAS_CUENTA,
   especificacion,
   conversionACuenta,
   precioPar,
   calcularPosicion,
+  distanciaEnPips,
 } from "@/lib/tamanoPosicion";
 
 const num = (v) => {
@@ -25,6 +26,9 @@ export default function CalculadoraPage() {
   const [balance, setBalance] = useState("10000");
   const [riesgo, setRiesgo] = useState("1");
   const [stop, setStop] = useState("20");
+  const [modoStop, setModoStop] = useState("distancia"); // distancia | precios
+  const [entrada, setEntrada] = useState("");
+  const [precioSl, setPrecioSl] = useState("");
   const [tasas, setTasas] = useState(null);
   const [fechaTasas, setFechaTasas] = useState(null);
   const [estadoTasas, setEstadoTasas] = useState("cargando"); // cargando | ok | error
@@ -51,7 +55,15 @@ export default function CalculadoraPage() {
   // Un tipo de cambio manual solo vale para el par y la cuenta en que se cargó.
   useEffect(() => setConversionManual(""), [instrumento, cuenta]);
 
-  const spec = especificacion(instrumento);
+  // Índices, cripto y oro: el tamaño de contrato depende del broker, así que es editable.
+  const [contratoManual, setContratoManual] = useState("");
+  useEffect(() => setContratoManual(""), [instrumento]);
+
+  const base = especificacion(instrumento);
+  const spec = { ...base, contrato: contratoManual !== "" ? num(contratoManual) : base.contrato };
+  const unidadStopSing = spec.unidadStop === "pips" ? "pip" : "punto";
+  const stopPips =
+    modoStop === "distancia" ? num(stop) : distanciaEnPips(num(entrada), num(precioSl), spec.pip);
   const conversionAuto = conversionACuenta(spec.quote, cuenta, tasas);
   const conversion = conversionManual !== "" ? num(conversionManual) : conversionAuto;
   const precio = precioPar(spec.base, spec.quote, cuenta, tasas);
@@ -62,12 +74,12 @@ export default function CalculadoraPage() {
       calcularPosicion({
         balance: num(balance),
         riesgoPct: num(riesgo),
-        stopPips: num(stop),
+        stopPips,
         pip: spec.pip,
         contrato: spec.contrato,
         conversion,
       }),
-    [balance, riesgo, stop, spec.pip, spec.contrato, conversion]
+    [balance, riesgo, stopPips, spec.pip, spec.contrato, conversion]
   );
 
   const riesgoAlto = num(riesgo) > 2;
@@ -86,7 +98,11 @@ export default function CalculadoraPage() {
             <div>
               <label className="field-label" htmlFor="calc-instrumento">Instrumento</label>
               <select id="calc-instrumento" className="field font-mono" value={instrumento} onChange={(e) => setInstrumento(e.target.value)}>
-                {INSTRUMENTOS.map((i) => <option key={i}>{i}</option>)}
+                {GRUPOS.map((g) => (
+                  <optgroup key={g.grupo} label={g.grupo}>
+                    {g.items.map((i) => <option key={i.id}>{i.id}</option>)}
+                  </optgroup>
+                ))}
               </select>
             </div>
             <div>
@@ -121,19 +137,84 @@ export default function CalculadoraPage() {
                 ))}
               </div>
             </div>
-            <div>
-              <label className="field-label" htmlFor="calc-stop">Stop loss (pips)</label>
-              <input id="calc-stop" inputMode="decimal" className="field font-mono tabular-nums" value={stop} onChange={(e) => setStop(e.target.value)} />
-              <p className="mt-2 text-xs text-faint">
-                1 pip = {String(spec.pip).replace(".", ",")} en el precio de {instrumento}
-              </p>
-            </div>
+            <fieldset className="sm:col-span-2">
+              <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+                <legend className="text-sm font-medium text-muted">Stop loss</legend>
+                <div role="radiogroup" aria-label="Cómo ingresar el stop" className="inline-flex rounded-md border border-line p-0.5">
+                  {[
+                    ["distancia", `En ${spec.unidadStop}`],
+                    ["precios", "Entrada y SL"],
+                  ].map(([valor, texto]) => (
+                    <button
+                      key={valor}
+                      type="button"
+                      role="radio"
+                      aria-checked={modoStop === valor}
+                      onClick={() => setModoStop(valor)}
+                      className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
+                        modoStop === valor ? "bg-accent text-accent-ink" : "text-muted hover:text-ink"
+                      }`}
+                    >
+                      {texto}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {modoStop === "distancia" ? (
+                <>
+                  <label className="sr-only" htmlFor="calc-stop">Stop loss en {spec.unidadStop}</label>
+                  <input id="calc-stop" inputMode="decimal" className="field font-mono tabular-nums" value={stop} onChange={(e) => setStop(e.target.value)} />
+                  <p className="mt-2 text-xs text-faint">
+                    1 {unidadStopSing} = {String(spec.pip).replace(".", ",")} en el precio de {instrumento}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="field-label" htmlFor="calc-entrada">Precio de entrada</label>
+                      <input id="calc-entrada" inputMode="decimal" className="field font-mono tabular-nums" value={entrada} onChange={(e) => setEntrada(e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="field-label" htmlFor="calc-sl">Precio del stop loss</label>
+                      <input id="calc-sl" inputMode="decimal" className="field font-mono tabular-nums" value={precioSl} onChange={(e) => setPrecioSl(e.target.value)} />
+                    </div>
+                  </div>
+                  <p className="mt-2 text-xs text-faint" role="status">
+                    {stopPips > 0
+                      ? `Distancia: ${fmt(stopPips, 1)} ${spec.unidadStop} · ${num(precioSl) < num(entrada) ? "compra (SL por debajo)" : "venta (SL por encima)"}`
+                      : "Ingresá ambos precios con el SL distinto de la entrada."}
+                  </p>
+                </>
+              )}
+            </fieldset>
           </div>
 
           {riesgoAlto && (
             <p className="rounded-md border border-warn/40 bg-warn/10 px-3 py-2 text-sm text-warn">
               Arriesgar más del 2% por operación puede vaciar la cuenta en una mala racha.
             </p>
+          )}
+
+          {spec.variable && (
+            <div className="rounded-md border border-line bg-bg p-4">
+              <label className="field-label" htmlFor="calc-contrato">
+                Tamaño de contrato: {spec.unidadContrato} por lote
+              </label>
+              <input
+                id="calc-contrato"
+                inputMode="decimal"
+                className="field font-mono tabular-nums"
+                placeholder={String(base.contrato)}
+                value={contratoManual}
+                onChange={(e) => setContratoManual(e.target.value)}
+              />
+              <p className="mt-2 text-xs text-faint">
+                Por defecto {base.contrato} ({fmt(base.pip * base.contrato, base.pip < 1 ? 2 : 0)} {spec.quote} por {unidadStopSing} y por lote).
+                Cambia según el broker: revisá la especificación del contrato en tu plataforma.
+              </p>
+            </div>
           )}
 
           {/* Tipo de cambio */}
@@ -177,8 +258,11 @@ export default function CalculadoraPage() {
                 {[
                   ["Dinero en riesgo", `${fmt(r.montoRiesgo)} ${cuenta}`],
                   ["Riesgo real con ese lotaje", `${fmt(r.riesgoReal)} ${cuenta}`],
-                  ["Unidades", fmt(r.unidades, 0)],
-                  ["Valor del pip por lote", `${fmt(r.valorPipLote)} ${cuenta}`],
+                  [
+                    spec.unidadContrato === "unidades" ? "Unidades" : `Cantidad (${spec.unidadContrato})`,
+                    fmt(r.unidades, r.unidades < 10 ? 4 : 0),
+                  ],
+                  [`Valor del ${unidadStopSing} por lote`,`${fmt(r.valorPipLote)} ${cuenta}`],
                   ...(precio ? [[`Precio ${instrumento}`, fmt(precio, spec.quote === "JPY" ? 3 : 5)]] : []),
                 ].map(([k, v]) => (
                   <div key={k} className="flex items-baseline justify-between gap-4 py-2.5">
@@ -204,7 +288,7 @@ export default function CalculadoraPage() {
       </div>
 
       <p className="mt-6 max-w-2xl text-xs leading-relaxed text-faint">
-        1 lote estándar = {spec.contrato.toLocaleString("es-AR")} {spec.base === "XAU" ? "oz" : "unidades"}.
+        {Number.isFinite(spec.contrato) && `1 lote = ${spec.contrato.toLocaleString("es-AR")} ${spec.unidadContrato}.`}
         Los cálculos son orientativos: el valor del pip, el tamaño de contrato y el lote mínimo pueden variar según tu broker.
       </p>
     </div>
