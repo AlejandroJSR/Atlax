@@ -245,7 +245,7 @@ function AlumnosPage() {
               <p className="mx-auto mt-1 max-w-sm text-sm text-muted">
                 Si ya pagaste, tu compra está en revisión. Te avisamos apenas se apruebe.
               </p>
-              <a href="/#cursos" className="btn-secondary btn-sm mt-5">Ver cursos disponibles</a>
+              <a href="/#planes" className="btn-secondary btn-sm mt-5">Ver planes disponibles</a>
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">

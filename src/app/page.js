@@ -90,7 +90,7 @@ const incluye = [
 ];
 
 const pasos = [
-  ["Elige tu curso", "Completa tus datos y crea la contraseña de tu cuenta de alumno."],
+  ["Elige tu plan", "Completa tus datos y crea la contraseña de tu cuenta de alumno."],
   ["Realiza el pago", "Por PayPal o USDT (TRC20). Si pagas con USDT, pega el ID de la transacción."],
   ["Empieza a estudiar", "Verificamos el pago, activamos tu cuenta y entras a la plataforma de clases."],
 ];
@@ -98,7 +98,7 @@ const pasos = [
 const faqs = [
   {
     pregunta: "¿Necesito experiencia previa?",
-    respuesta: "No. Los cursos empiezan por los fundamentos y avanzan por módulos, a tu ritmo.",
+    respuesta: "No. El programa empieza por los fundamentos y avanzan por módulos, a tu ritmo.",
   },
   {
     pregunta: "¿Garantizan ganancias?",
@@ -208,7 +208,7 @@ export default function Home() {
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 8);
-      const cursosEl = document.getElementById("cursos");
+      const cursosEl = document.getElementById("planes");
       const pasadoHero = window.scrollY > window.innerHeight * 0.8;
       const enCursos =
         cursosEl &&
@@ -328,8 +328,6 @@ export default function Home() {
 
   const navLinks = [
     { href: "#programa", label: "Programa" },
-    { href: "#cursos", label: "Cursos" },
-    { href: "#inscripcion", label: "Inscripción" },
     { href: "#faq", label: "Preguntas" },
     { href: "#contacto", label: "Contacto" },
     { herramientas: true }, // desplegable con calculadora y calendario, al final junto a "Acceso alumnos"
@@ -462,8 +460,8 @@ export default function Home() {
             </p>
             <div className="animate-fadeInUp flex flex-wrap gap-3" style={{ animationDelay: "180ms" }}>
               {/* Menos brillante: sin resplandor y con el violeta un poco atenuado; se aviva al pasar el mouse. */}
-              <a href="#cursos" className="btn-primary group rounded-lg bg-accent/80 px-6 py-3.5 text-white/95 hover:bg-accent-hover">
-                Ver cursos y precios
+              <a href="#planes" className="btn-primary group rounded-lg bg-accent/80 px-6 py-3.5 text-white/95 hover:bg-accent-hover">
+                Ver planes y precios
                 <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
               </a>
               <button type="button" onClick={() => setShowLogin(true)} className="btn-secondary rounded-lg px-6 py-3.5">
@@ -574,15 +572,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CURSOS */}
-      <section id="cursos" className="border-t border-line py-24">
+      {/* PLANES (antes "cursos": evitamos la palabra por su mala reputación en el rubro) */}
+      <section id="planes" className="border-t border-line py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <Reveal className="mb-10 flex flex-col justify-between gap-3 md:flex-row md:items-end">
-            <h2 className="text-4xl font-bold tracking-tight text-ink">Cursos y precios</h2>
+            <h2 className="text-4xl font-bold tracking-tight text-ink">Planes y precios</h2>
             <p className="max-w-sm text-muted">Pago único en dólares y acceso de por vida al material grabado.</p>
           </Reveal>
           {loadingCursos ? (
-            <div className="mx-auto grid max-w-xl gap-5 lg:max-w-none lg:grid-cols-3" aria-busy="true" aria-label="Cargando cursos">
+            <div className="mx-auto grid max-w-xl gap-5 lg:max-w-none lg:grid-cols-3" aria-busy="true" aria-label="Cargando planes">
               {[1, 2, 3].map((n) => (
                 <div key={n} className="h-[380px] animate-pulse rounded-2xl border border-line bg-surface p-7">
                   <div className="mb-4 h-5 w-2/3 rounded bg-surface-2" />
@@ -594,7 +592,7 @@ export default function Home() {
             </div>
           ) : cursos.length === 0 ? (
             <p className="rounded-2xl border border-line bg-surface p-7 text-muted">
-              No hay cursos abiertos en este momento. Escríbenos a{" "}
+              No hay planes abiertos en este momento. Escríbenos a{" "}
               <a className="text-accent-soft underline transition-colors hover:text-ink" href={`mailto:${EMAIL_CONTACTO}`}>{EMAIL_CONTACTO}</a>{" "}
               para conocer la próxima apertura.
             </p>
@@ -749,7 +747,7 @@ export default function Home() {
             ))}
           </Reveal>
           <Reveal delay={200} className="mt-12">
-            <a href="#cursos" className="btn-secondary">Elegir mi curso</a>
+            <a href="#planes" className="btn-secondary">Elegir mi plan</a>
           </Reveal>
         </div>
       </section>
@@ -848,7 +846,7 @@ export default function Home() {
           <h2 className="text-4xl font-bold tracking-tight text-ink">Contacto</h2>
           <div>
             <p className="mb-6 max-w-xl leading-relaxed text-muted">
-              ¿Dudas sobre qué curso te conviene, los pagos o el estado de tu inscripción? Escríbenos y te respondemos personalmente.
+              ¿Dudas sobre qué plan te conviene, los pagos o el estado de tu inscripción? Escríbenos y te respondemos personalmente.
             </p>
             <a href={`mailto:${EMAIL_CONTACTO}`} className="btn-secondary">
               {EMAIL_CONTACTO}
@@ -900,8 +898,8 @@ export default function Home() {
         }`}
         aria-hidden={!showStickyCta}
       >
-        <a href="#cursos" className="btn-primary w-full" tabIndex={showStickyCta ? 0 : -1}>
-          Ver cursos y precios
+        <a href="#planes" className="btn-primary w-full" tabIndex={showStickyCta ? 0 : -1}>
+          Ver planes y precios
         </a>
       </div>
     </div>

@@ -3,7 +3,7 @@ import NavPublica from "@/components/NavPublica";
 
 /**
  * Marco común de las herramientas gratuitas públicas (/calculadora, /calendario):
- * menú con "Herramientas", encabezado, contenido, llamado a los cursos y aviso legal.
+ * menú con "Herramientas", encabezado, contenido, llamado a los planes y aviso legal.
  */
 export default function HerramientaPublica({ titulo, descripcion, children, compacto = false }) {
   return (
@@ -25,11 +25,11 @@ export default function HerramientaPublica({ titulo, descripcion, children, comp
           <div>
             <h2 className="mb-2 text-2xl font-bold text-ink">¿Quieres operar con un plan de riesgo completo?</h2>
             <p className="max-w-xl text-muted">
-              En nuestros cursos aprendes a gestionar capital y a operar dentro de las reglas de una prueba de fondeo.
+              En el programa aprendes a gestionar capital y a operar dentro de las reglas de una prueba de fondeo.
             </p>
           </div>
-          <Link href="/#cursos" className="btn-primary flex-none rounded-lg px-6 py-3.5">
-            Ver cursos y precios
+          <Link href="/#planes" className="btn-primary flex-none rounded-lg px-6 py-3.5">
+            Ver planes y precios
           </Link>
         </section>
       </main>
