@@ -13,7 +13,7 @@ const CRIPTO = (base) => ({ id: `${base}/USD`, base, quote: "USD", pip: 1, contr
 
 export const GRUPOS = [
   {
-    grupo: "Forex",
+    grupo: "Divisas",
     items: [
       "EUR/USD", "GBP/USD", "USD/JPY", "USD/CHF", "USD/CAD", "AUD/USD", "NZD/USD",
       "EUR/GBP", "EUR/JPY", "GBP/JPY", "EUR/CHF", "EUR/AUD", "AUD/JPY", "GBP/CHF", "CAD/JPY",
