@@ -231,11 +231,11 @@ export default function CalendarioEconomico() {
       </div>
 
       {/* CALENDARIO */}
-      <div ref={panelRef} className="panel relative flex min-h-[300px] flex-1 flex-col overflow-hidden pr-4">
+      <div ref={panelRef} className="panel relative flex min-h-[300px] flex-1 flex-col overflow-hidden px-3 pt-3">
         {modoTabla && (
           // Títulos propios: el widget no los tiene. Posiciones medidas sobre el widget en modo tabla
           // (hora/país/impacto/evento fijas en px desde la izquierda; valores en % desde la derecha).
-          <div className="relative h-8 flex-none border-b border-line bg-surface-2 font-mono text-[11px] uppercase tracking-wider text-muted" aria-hidden="true">
+          <div className="relative h-8 flex-none rounded-md bg-surface-2 font-mono text-[11px] uppercase tracking-wider text-muted" aria-hidden="true">
             <span className="absolute top-2" style={{ left: 18 * escala }}>Hora</span>
             <span className="absolute top-2" style={{ left: 92 * escala }}>País</span>
             <span className="absolute top-2" style={{ left: (modoAncho ? 262 : 140) * escala }}>Imp.</span>
