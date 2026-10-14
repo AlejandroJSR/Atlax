@@ -40,7 +40,7 @@ export default function AlumnosLayout({ children }) {
         onLogout={logout}
         area="Campus"
       />
-      <main className={`min-w-0 px-6 py-8 transition-[margin] duration-200 md:px-10 ${sidebarOpen ? "ml-60" : "ml-16"}`}>
+      <main className={`isolate min-w-0 px-4 pb-8 pt-20 transition-[margin] duration-200 sm:px-6 lg:px-10 lg:pt-8 ${sidebarOpen ? "lg:ml-60" : "lg:ml-16"}`}>
         {children}
       </main>
     </div>
