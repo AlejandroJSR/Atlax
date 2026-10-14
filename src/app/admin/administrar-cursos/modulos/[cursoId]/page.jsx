@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
@@ -63,65 +64,68 @@ export default function ModulosPage() {
     }
   };
 
-  if (loading) return <p className="text-gray-900">Cargando módulos...</p>;
+  if (loading) return <p className="text-muted">Cargando módulos…</p>;
   const modulos = curso?.modulos || [];
 
   return (
-    <div>
-      <h2 className="mb-6 text-xl font-bold text-[#2d249c]">Módulos del curso</h2>
-      <button
-        onClick={() => router.back()}
-        className="mb-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-      >
-        ← Volver
-      </button>
-      <button
-        className="mb-4 ml-2 bg-[#2d249c] text-white px-4 py-2 rounded hover:bg-[#241d74]"
-        onClick={() => abrirModal()}
-      >
-        Crear Módulo
-      </button>
+    <div className="max-w-5xl">
+      <nav aria-label="Ubicación" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm">
+        <Link href="/admin/administrar-cursos" className="text-muted underline-offset-4 hover:text-ink hover:underline">
+          Administrar cursos
+        </Link>
+        <span className="text-faint" aria-hidden="true">/</span>
+        <span aria-current="page" className="text-ink">{curso?.nombre || "Curso"}</span>
+      </nav>
+
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="page-title">Módulos</h2>
+          <p className="mt-1 text-sm text-muted">{curso?.nombre}</p>
+        </div>
+        <button className="btn-primary btn-sm" onClick={() => abrirModal()}>
+          + Crear módulo
+        </button>
+      </div>
 
       {modulos.length === 0 ? (
-        <p className="text-gray-900">No hay módulos registrados.</p>
+        <div className="panel px-6 py-12 text-center">
+          <p className="font-medium text-ink">Este curso todavía no tiene módulos</p>
+          <p className="mt-1 text-sm text-muted">Creá el primero y después agregale clases.</p>
+        </div>
       ) : (
-        <div className="w-full bg-white rounded-xl shadow-lg mb-4 overflow-x-auto max-w-full">
-          <table className="w-full text-xs md:text-sm text-left">
+        <div className="panel overflow-x-auto">
+          <table className="data-table">
             <thead>
-              <tr className="bg-violet-100 text-gray-900">
-                <th className="px-2 py-2 font-bold">Nombre</th>
-                <th className="px-2 py-2 font-bold">Descripción</th>
-                <th className="px-2 py-2 font-bold">Acciones</th>
+              <tr>
+                <th className="w-12">#</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th className="text-right">Clases</th>
+                <th className="text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {modulos.map((modulo) => (
-                <tr key={modulo.id} className="border-b hover:bg-gray-50">
-                  <td className="px-2 py-2 text-gray-900">{modulo.nombre}</td>
-                  <td className="px-2 py-2 text-gray-900">{modulo.descripcion}</td>
-                  <td className="px-2 py-2 flex gap-2">
-                    <button
-                      onClick={() => abrirModal(modulo)}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() =>
-                        router.push(
-                          `/admin/administrar-cursos/modulos/${cursoId}/clases/${modulo.id}`
-                        )
-                      }
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
-                    >
-                      Clases
-                    </button>
-                    <button
-                      onClick={() => eliminarModulo(modulo.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                    >
-                      Eliminar
-                    </button>
+              {modulos.map((modulo, idx) => (
+                <tr key={modulo.id}>
+                  <td className="font-mono tabular-nums text-faint">{String(idx + 1).padStart(2, "0")}</td>
+                  <td className="font-medium">{modulo.nombre}</td>
+                  <td className="text-muted">{modulo.descripcion}</td>
+                  <td className="text-right font-mono tabular-nums text-muted">{(modulo.clases || []).length}</td>
+                  <td>
+                    <div className="flex justify-end gap-2">
+                      <button onClick={() => abrirModal(modulo)} className="btn-secondary btn-sm">
+                        Editar
+                      </button>
+                      <Link
+                        href={`/admin/administrar-cursos/modulos/${cursoId}/clases/${modulo.id}`}
+                        className="btn-secondary btn-sm"
+                      >
+                        Clases
+                      </Link>
+                      <button onClick={() => eliminarModulo(modulo.id)} className="btn-danger">
+                        Eliminar
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -131,44 +135,39 @@ export default function ModulosPage() {
       )}
 
       {modalOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md text-gray-900">
-            <h3 className="text-lg font-bold mb-4">
-              {moduloActual ? "Editar Módulo" : "Crear Módulo"}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <div role="dialog" aria-modal="true" aria-labelledby="modulo-modal-titulo" className="panel animate-fadein w-full max-w-md p-6 shadow-2xl">
+            <h3 id="modulo-modal-titulo" className="mb-5 text-xl font-semibold text-ink">
+              {moduloActual ? "Editar módulo" : "Crear módulo"}
             </h3>
-            <label className="block mb-2">
-              Nombre:
-              <input
-                type="text"
-                className="w-full border rounded p-2 text-gray-900"
-                value={formData.nombre}
-                onChange={(e) =>
-                  setFormData({ ...formData, nombre: e.target.value })
-                }
-              />
-            </label>
-            <label className="block mb-2">
-              Descripción:
-              <textarea
-                className="w-full border rounded p-2 text-gray-900"
-                value={formData.descripcion}
-                onChange={(e) =>
-                  setFormData({ ...formData, descripcion: e.target.value })
-                }
-              />
-            </label>
-            <div className="flex justify-end mt-4">
-              <button
-                className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded mr-2"
-                onClick={() => setModalOpen(false)}
-              >
+            <div className="space-y-4">
+              <div>
+                <label className="field-label" htmlFor="modulo-nombre">Nombre</label>
+                <input
+                  id="modulo-nombre"
+                  type="text"
+                  className="field"
+                  value={formData.nombre}
+                  onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="field-label" htmlFor="modulo-descripcion">Descripción</label>
+                <textarea
+                  id="modulo-descripcion"
+                  rows={3}
+                  className="field resize-y"
+                  value={formData.descripcion}
+                  onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button className="btn-secondary btn-sm" onClick={() => setModalOpen(false)}>
                 Cancelar
               </button>
-              <button
-                className="bg-[#2d249c] hover:bg-[#241d74] text-white px-4 py-2 rounded"
-                onClick={guardarModulo}
-              >
-                Guardar
+              <button className="btn-primary btn-sm" onClick={guardarModulo}>
+                Guardar módulo
               </button>
             </div>
           </div>
@@ -177,4 +176,3 @@ export default function ModulosPage() {
     </div>
   );
 }
-

@@ -1,11 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { v4 as uuidv4 } from "uuid";
-import ClaseEditor from "@/components/ClaseEditor";
+import dynamic from "next/dynamic";
+
+// CKEditor usa window al importarse: solo se puede cargar en el cliente.
+const ClaseEditor = dynamic(() => import("@/components/ClaseEditor"), {
+  ssr: false,
+  loading: () => <p className="text-muted">Cargando editor…</p>,
+});
 
 export default function ClasesPage() {
   const { cursoId, moduloId } = useParams();
@@ -93,53 +100,70 @@ export default function ClasesPage() {
     );
   }
 
-  return (
-    <div>
-      <h2 className="mb-6 text-xl font-bold text-[#2d249c]">Clases del módulo</h2>
-      <button
-        onClick={() => router.back()}
-        className="mb-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-      >
-        ← Volver
-      </button>
-      <button
-        onClick={handleNew}
-        className="mb-4 ml-2 bg-[#2d249c] text-white px-4 py-2 rounded hover:bg-[#241d74]"
-      >
-        Crear Clase
-      </button>
 
-      {clases.length === 0 ? (
-        <p className="text-gray-900">No hay clases creadas</p>
+  const modulo = getModuloActual();
+
+  return (
+    <div className="max-w-5xl">
+      <nav aria-label="Ubicación" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm">
+        <Link href="/admin/administrar-cursos" className="text-muted underline-offset-4 hover:text-ink hover:underline">
+          Administrar cursos
+        </Link>
+        <span className="text-faint" aria-hidden="true">/</span>
+        <Link href={`/admin/administrar-cursos/modulos/${cursoId}`} className="text-muted underline-offset-4 hover:text-ink hover:underline">
+          {curso?.nombre || "Curso"}
+        </Link>
+        <span className="text-faint" aria-hidden="true">/</span>
+        <span aria-current="page" className="text-ink">{modulo?.nombre || "Módulo"}</span>
+      </nav>
+
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="page-title">Clases</h2>
+          <p className="mt-1 text-sm text-muted">{modulo?.nombre}</p>
+        </div>
+        <button onClick={handleNew} className="btn-primary btn-sm">
+          + Crear clase
+        </button>
+      </div>
+
+      {!curso ? (
+        <p className="text-muted">Cargando clases…</p>
+      ) : clases.length === 0 ? (
+        <div className="panel px-6 py-12 text-center">
+          <p className="font-medium text-ink">Este módulo todavía no tiene clases</p>
+          <p className="mt-1 text-sm text-muted">Creá la primera: título, video y material de apoyo.</p>
+        </div>
       ) : (
-        <div className="w-full bg-white rounded-xl shadow-lg mb-4 overflow-x-auto max-w-full">
-          <table className="w-full text-xs md:text-sm text-left">
+        <div className="panel overflow-x-auto">
+          <table className="data-table">
             <thead>
-              <tr className="bg-violet-100 text-gray-900">
-                <th className="px-2 py-2 font-bold">Título</th>
-                <th className="px-2 py-2 font-bold">Acciones</th>
+              <tr>
+                <th className="w-12">#</th>
+                <th>Título</th>
+                <th className="text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {clases.map((clase) => (
-                <tr key={clase.id} className="border-b hover:bg-gray-50">
-                  <td className="px-2 py-2 text-gray-900">{clase.titulo}</td>
-                  <td className="px-2 py-2 flex gap-2">
-                    <button
-                      onClick={() => {
-                        setEditing(clase);
-                        setIsNew(false);
-                      }}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDelete(clase.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                    >
-                      Eliminar
-                    </button>
+              {clases.map((clase, idx) => (
+                <tr key={clase.id}>
+                  <td className="font-mono tabular-nums text-faint">{String(idx + 1).padStart(2, "0")}</td>
+                  <td className="font-medium">{clase.titulo || <span className="text-faint">Sin título</span>}</td>
+                  <td>
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => {
+                          setEditing(clase);
+                          setIsNew(false);
+                        }}
+                        className="btn-secondary btn-sm"
+                      >
+                        Editar
+                      </button>
+                      <button onClick={() => handleDelete(clase.id)} className="btn-danger">
+                        Eliminar
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -15,49 +15,55 @@ export default function ClaseEditor({ initialData, onSave, onDelete, onBack }) {
   };
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-lg max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">
-        {initialData?.id ? "Editar Clase" : "Crear Clase"}
+    <div className="max-w-4xl">
+      <button onClick={onBack} className="mb-6 text-sm text-muted underline-offset-4 hover:text-ink hover:underline">
+        ← Volver a las clases
+      </button>
+      <h2 className="page-title mb-6">
+        {initialData?.id ? "Editar clase" : "Crear clase"}
       </h2>
 
-      <input
-        type="text"
-        className="w-full p-3 border rounded-lg mb-4 text-gray-900"
-        value={titulo}
-        onChange={(e) => setTitulo(e.target.value)}
-        placeholder="Título de la clase"
-      />
+      <div className="space-y-5">
+        <div>
+          <label className="field-label" htmlFor="clase-titulo">Título de la clase</label>
+          <input
+            id="clase-titulo"
+            type="text"
+            className="field"
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+          />
+        </div>
 
-      <div className="border rounded-lg mb-4">
-        <CKEditor
-          editor={ClassicEditor}
-          data={contenido}
-          onChange={(_, editor) => setContenido(editor.getData())}
-        />
+        <div>
+          <span className="field-label">Contenido</span>
+          <p className="mb-2 text-xs text-faint">Pegá un link de YouTube para insertar el video.</p>
+          <div className="overflow-hidden rounded-md border border-line">
+            <CKEditor
+              editor={ClassicEditor}
+              data={contenido}
+              onChange={(_, editor) => setContenido(editor.getData())}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="flex justify-end gap-3">
-        <button
-          onClick={handleSave}
-          disabled={guardando}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg"
-        >
-          {guardando ? "Guardando..." : "Guardar"}
-        </button>
-        {onDelete && (
-          <button
-            onClick={onDelete}
-            className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg"
-          >
-            Eliminar
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
+        {onDelete ? (
+          <button onClick={onDelete} className="btn-danger">
+            Eliminar clase
           </button>
+        ) : (
+          <span />
         )}
-        <button
-          onClick={onBack}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg"
-        >
-          Volver
-        </button>
+        <div className="flex gap-2">
+          <button onClick={onBack} className="btn-secondary btn-sm">
+            Cancelar
+          </button>
+          <button onClick={handleSave} disabled={guardando} className="btn-primary btn-sm">
+            {guardando ? "Guardando…" : "Guardar clase"}
+          </button>
+        </div>
       </div>
     </div>
   );
