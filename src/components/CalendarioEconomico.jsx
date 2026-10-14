@@ -24,11 +24,14 @@ const IMPACTOS = [
 ];
 
 // Por defecto se ven todos los eventos: el impacto se lee en las barras de cada fila (ver leyenda).
-const PREDETERMINADO = { divisas: ["USD", "EUR", "GBP"], impacto: "todos" };
+const PREDETERMINADO = { divisas: ["USD", "EUR", "GBP"], impacto: "todos", zoom: 0.75 };
 
 // Zoom del widget cuando hay espacio, y ancho desde el cual el widget usa su modo tabla
 // (por debajo apila cada evento con etiquetas propias P:/A:). Medido: 700px apila, 760px tabla.
-const ESCALA_ANCHO = 0.85;
+// Densidad ajustable por el alumno (cada pantalla y zoom del navegador es distinto).
+const ZOOM_MIN = 0.6;
+const ZOOM_MAX = 1;
+const ZOOM_PASO = 0.05;
 const ANCHO_TABLA = 760;
 const ANCHO_TABLA_AMPLIA = 1212; // medido: 1210px diseño normal, 1215px diseño amplio
 
@@ -47,7 +50,10 @@ const CLAVE = "atlax.calendario";
 function leerPreferencias() {
   try {
     const p = JSON.parse(localStorage.getItem(CLAVE));
-    if (p && Array.isArray(p.divisas) && p.divisas.length && IMPACTOS.some((i) => i.id === p.impacto)) return p;
+    if (p && Array.isArray(p.divisas) && p.divisas.length && IMPACTOS.some((i) => i.id === p.impacto)) {
+      const zoom = p.zoom >= ZOOM_MIN && p.zoom <= ZOOM_MAX ? p.zoom : PREDETERMINADO.zoom;
+      return { ...p, zoom };
+    }
   } catch {
     /* sin almacenamiento disponible: se usan los valores por defecto */
   }
@@ -145,7 +151,9 @@ export default function CalendarioEconomico() {
     return () => ro.disconnect();
   }, []);
   // En el celular no se achica: ahí el widget ya apila los eventos con etiquetas y achicarlo lo haría ilegible.
-  const escala = ancho >= 700 ? ESCALA_ANCHO : 1;
+  const escala = ancho >= 700 ? pref.zoom : 1;
+  const cambiarZoom = (delta) =>
+    setPref((p) => ({ ...p, zoom: Math.round(Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, p.zoom + delta)) * 100) / 100 }));
   const modoTabla = ancho > 0 && ancho / escala >= ANCHO_TABLA;
   // Desde ~1212px el widget agrega el nombre del país y corre impacto y evento a la derecha.
   const modoAncho = ancho / escala >= ANCHO_TABLA_AMPLIA;
@@ -179,8 +187,8 @@ export default function CalendarioEconomico() {
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
       {/* FILTROS */}
-      <div className="flex flex-col gap-3 @container lg:flex-row lg:items-center lg:justify-between">
-        <div role="radiogroup" aria-label="Impacto" className="grid grid-cols-3 rounded-md border border-line bg-surface p-1 lg:inline-grid">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2">
+        <div role="radiogroup" aria-label="Impacto" className="grid flex-none grid-cols-3 rounded-md border border-line bg-surface p-1 sm:inline-grid">
           {IMPACTOS.map((i) => {
             const activo = pref.impacto === i.id;
             return (
@@ -190,7 +198,7 @@ export default function CalendarioEconomico() {
                 role="radio"
                 aria-checked={activo}
                 onClick={() => setPref((p) => ({ ...p, impacto: i.id }))}
-                className={`flex h-9 items-center justify-center gap-2 rounded px-3 text-sm font-medium transition-colors ${
+                className={`flex h-9 items-center justify-center gap-1.5 rounded px-2.5 text-sm font-medium transition-colors ${
                   activo ? "bg-surface-2 text-ink" : "text-muted hover:text-ink"
                 }`}
               >
@@ -201,7 +209,7 @@ export default function CalendarioEconomico() {
           })}
         </div>
 
-        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5" role="group" aria-label="Divisas">
+        <div className="-mx-1 flex min-w-0 gap-1 overflow-x-auto px-1 pb-0.5 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0" role="group" aria-label="Divisas">
           {DIVISAS.map((d) => {
             const activa = pref.divisas.includes(d.codigo);
             return (
@@ -210,7 +218,7 @@ export default function CalendarioEconomico() {
                 type="button"
                 onClick={() => alternarDivisa(d.codigo)}
                 aria-pressed={activa}
-                className={`h-9 flex-none rounded-md border px-3 font-mono text-sm font-medium transition-colors ${
+                className={`h-9 flex-none rounded-md border px-2.5 font-mono text-sm font-medium transition-colors ${
                   activa ? "border-accent bg-accent/15 text-accent-soft" : "border-line text-muted hover:border-line-strong hover:text-ink"
                 }`}
               >
@@ -219,10 +227,11 @@ export default function CalendarioEconomico() {
             );
           })}
         </div>
+
       </div>
 
       {/* CALENDARIO */}
-      <div ref={panelRef} className="panel relative flex min-h-[300px] flex-1 flex-col overflow-hidden">
+      <div ref={panelRef} className="panel relative flex min-h-[300px] flex-1 flex-col overflow-hidden pr-4">
         {modoTabla && (
           // Títulos propios: el widget no los tiene. Posiciones medidas sobre el widget en modo tabla
           // (hora/país/impacto/evento fijas en px desde la izquierda; valores en % desde la derecha).
@@ -280,6 +289,34 @@ export default function CalendarioEconomico() {
           {!modoTabla && "R: real · P: previsión · A: anterior. "}
           {zona && <>Horarios en tu zona ({zona}). </>}Fuente: TradingView.
         </span>
+        {/* Densidad junto a la leyenda: no ocupa una fila arriba. Más chico = más eventos del día a la vista; en celular no se achica. */}
+        {ancho >= 700 && (
+          <div className="ml-auto flex flex-none items-center rounded-md border border-line bg-surface" role="group" aria-label="Tamaño del calendario">
+            <button
+              type="button"
+              onClick={() => cambiarZoom(-ZOOM_PASO)}
+              disabled={pref.zoom <= ZOOM_MIN}
+              aria-label="Achicar: ver más eventos"
+              title="Ver más eventos"
+              className="flex h-8 w-8 items-center justify-center rounded-l-md text-muted hover:bg-surface-2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              −
+            </button>
+            <span className="w-12 text-center font-mono text-xs tabular-nums text-muted" aria-live="polite">
+              {Math.round(pref.zoom * 100)}%
+            </span>
+            <button
+              type="button"
+              onClick={() => cambiarZoom(ZOOM_PASO)}
+              disabled={pref.zoom >= ZOOM_MAX}
+              aria-label="Agrandar"
+              title="Agrandar"
+              className="flex h-8 w-8 items-center justify-center rounded-r-md text-muted hover:bg-surface-2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              +
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
