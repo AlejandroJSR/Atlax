@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { montarWidgetTradingView } from "@/lib/tradingview";
 
 // Calendario económico: widget oficial de TradingView (gratis, con dato real al salir la noticia)
 // envuelto con filtros propios. Los horarios salen en la zona horaria del navegador del alumno.
@@ -64,69 +65,17 @@ function WidgetEventos({ paises, importancia, intento, onEstado }) {
   const ref = useRef(null);
 
   useEffect(() => {
-    const el = ref.current;
     onEstado("cargando");
-
-    // Cada carga va en su propio envoltorio. El script de TradingView busca su contenedor al
-    // ejecutarse: si lo sacamos antes (cambio de filtro, doble montaje de React en desarrollo)
-    // tira "Cannot read properties of null". Por eso el envoltorio viejo se oculta ya y se
-    // elimina recién cuando su script terminó de correr.
-    const envoltorio = document.createElement("div");
-    envoltorio.className = "tradingview-widget-container h-full";
-    el.appendChild(envoltorio);
-
-    const contenedor = document.createElement("div");
-    contenedor.className = "tradingview-widget-container__widget";
-    contenedor.style.height = "100%";
-    envoltorio.appendChild(contenedor);
-
-    let scriptTermino = false;
-    const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-events.js";
-    script.async = true;
-    script.type = "text/javascript";
-    script.innerHTML = JSON.stringify({
-      colorTheme: "dark",
-      isTransparent: true,
-      locale: "es",
-      countryFilter: paises,
-      importanceFilter: importancia,
-      width: "100%",
-      height: "100%",
-    });
-    let vigente = true;
-    script.onload = () => {
-      scriptTermino = true;
-    };
-    script.onerror = () => {
-      scriptTermino = true;
-      if (vigente) onEstado("error");
-    };
-    envoltorio.appendChild(script);
-
-    // El script inyecta un iframe: cuando termina de cargar, el calendario está listo.
-    const observador = new MutationObserver(() => {
-      const iframe = envoltorio.querySelector("iframe");
-      if (iframe) {
-        iframe.addEventListener("load", () => vigente && onEstado("listo"), { once: true });
-        observador.disconnect();
-      }
-    });
-    observador.observe(envoltorio, { childList: true, subtree: true });
+    const desmontar = montarWidgetTradingView(
+      ref.current,
+      "https://s3.tradingview.com/external-embedding/embed-widget-events.js",
+      { colorTheme: "dark", isTransparent: true, locale: "es", countryFilter: paises, importanceFilter: importancia, width: "100%", height: "100%" },
+      { alto: "100%", onIframeListo: () => onEstado("listo"), onError: () => onEstado("error") }
+    );
     const demora = setTimeout(() => onEstado((e) => (e === "cargando" ? "lento" : e)), 15000);
-
     return () => {
-      vigente = false;
-      observador.disconnect();
       clearTimeout(demora);
-      envoltorio.style.display = "none";
-      if (scriptTermino) {
-        envoltorio.remove();
-      } else {
-        const quitar = () => setTimeout(() => envoltorio.remove(), 0);
-        script.addEventListener("load", quitar, { once: true });
-        script.addEventListener("error", quitar, { once: true });
-      }
+      desmontar();
     };
   }, [paises, importancia, intento, onEstado]);
 
